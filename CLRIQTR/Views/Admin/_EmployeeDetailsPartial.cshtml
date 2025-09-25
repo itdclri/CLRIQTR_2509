@@ -1,0 +1,53 @@
+@model CLRIQTR.Models.EmpMastTest
+
+<style>
+    /* Make table smaller and compact */
+    table.compact-details {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem; /* smaller font for entire table */
+    }
+
+        table.compact-details th, table.compact-details td {
+            padding: 0.3rem 0.6rem;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        table.compact-details th {
+            width: 140px;  fixed width for labels 
+            font-weight: 600;
+            white-space: nowrap;  prevent label wrapping 
+            background-color: #f8f9fa;
+        }
+
+        table.compact-details td {
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+</style>
+
+<table class="table compact-details">
+    <tr><th>Employee Number</th><td>@Model.EmpNo</td></tr>
+    <tr><th>Employee  Name</th><td>@Model.EmpName</td></tr>
+    <tr><th>Lab</th><td>@Model.LabName</td></tr>
+    <tr><th>Gender</th><td> @(Model.Gender == "M" ? "Male" : "Female")</td></tr>
+    <tr><th>Pay Level</th><td>@Model.PayLvl</td></tr>
+    <tr><th>Designation</th><td>@Model.DesDesc</td></tr>
+    <tr><th>Date of Birth</th><td>@Model.DOB</td></tr>
+    <tr><th>Date of Joining</th><td>@Model.DOJ</td></tr>
+    <tr><th>Basic Pay</th><td>@Model.BasicPay</td></tr>
+    <tr><th>Category</th><td>@Model.Category</td></tr>
+    <tr><th>Date of Present Post</th><td>@Model.DOP</td></tr>
+    <tr><th>Date of Superannuation</th><td>@Model.DOR</td></tr>
+    <tr><th>Email</th><td>@Model.Email</td></tr>
+    <tr><th>Handicapped</th><td>@(Model.Phy == "Y" ? "Yes" : "No")</td></tr>
+    <tr><th>Mobile</th><td>@Model.MobileNumber</td></tr>
+    <tr><th>Active</th><td>@(Model.Active == "Y" ? "Yes" : "No")</td></tr>
+
+    <!-- Add other fields here -->
+    <tr><th>Status</th><td>@(Model.QtrStatus == "O" ? "Occupied" : "Not Occupied")</td></tr>
+    <tr><th>Quarter Number</th><td>@Model.QtrNo</td></tr>
+    <tr><th>Occupied/Vacant Date</th><td>@Model.OccDate</td></tr>
+
+</table>

@@ -1,0 +1,46 @@
+@model CLRIQTR.Models.EmpMastTest
+@{
+    ViewBag.Title = "Deactivate Employee";
+}
+
+<div class="container">
+    <h2 class="text-center">Deactivate Employee: @Model.EmpName (@Model.EmpNo)</h2>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success text-center">@TempData["Message"]</div>
+    }
+
+    <div class="card p-3 mb-3">
+        <div class="form-group">
+            <label class="control-label">Emp No:</label>
+            <input type="text" class="form-control" value="@Model.EmpNo" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label">Name:</label>
+            <input type="text" class="form-control" value="@Model.EmpName" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label">Lab:</label>
+            <input type="text" class="form-control" value="@Model.LabName" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label">Designation:</label>
+            <input type="text" class="form-control" value="@Model.Designation" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label">Active:</label>
+            <input type="text" class="form-control" value="@(Model.Active == "Y" ? "Yes" : "No")" readonly />
+        </div>
+    </div>
+
+    <div class="deactivate-actions">
+        @using (Html.BeginForm("DeactivateConfirmed", "Admin", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.Hidden("id", Model.EmpNo)
+            <button type="submit" class="btn btn-danger">Confirm Deactivate</button>
+            @Html.ActionLink("Cancel", "Index", "Admin", null, new { @class = "btn btn-secondary" })
+        }
+    </div>
+</div>

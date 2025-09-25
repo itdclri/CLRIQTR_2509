@@ -1,0 +1,285 @@
+﻿@model CLRIQTR.Models.QtrUpd
+@{
+    ViewBag.Title = "Assign New Quarter";
+}
+
+<div class="container">
+    <h2 class="text-center">Assign New Quarters for Employee: @Model.empno</h2>
+
+    <!-- Display Validation Errors -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul>
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <!-- Display AJAX Errors -->
+    <div id="ajaxErrorContainer" style="display:none;"></div>
+
+    @using (Html.BeginForm("InsertQuarterDetails", "Admin", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.empno)
+
+        <!-- Quarter Type -->
+        <div class="form-group">
+            <label class="control-label">Quarter Type</label>
+            @Html.DropDownListFor(m => m.qtrtype,
+                (SelectList)ViewBag.QtrTypes,
+                "Select Quarter Type",
+                new { @class = "form-control", id = "QtrTypeDropdown" })
+        </div>
+
+        <!-- FN / AN -->
+        <div class="form-group">
+            <label class="control-label">Forenoon / Afternoon</label>
+            @Html.DropDownListFor(m => m.FNAN,
+                new List<SelectListItem> {
+                    new SelectListItem{ Text="Forenoon", Value="FN" },
+                    new SelectListItem{ Text="Afternoon", Value="AN" }
+                }, "Select Time",
+                new { @class = "form-control" })
+        </div>
+
+        <!-- Status -->
+        <div class="form-group">
+            <label class="control-label">Quarter Status</label>
+            @Html.DropDownListFor(m => m.qtrstatus,
+                new List<SelectListItem> {
+                    new SelectListItem{ Text="Occupied", Value="O" },
+                    new SelectListItem{ Text="Vacant", Value="V" }
+                }, "Select Status",
+                new { @class = "form-control" })
+        </div>
+
+        <!-- Quarter Numbers (Checkbox List) -->
+        <div class="form-group">
+            <label class="control-label">Quarter Numbers</label>
+            <div id="QuarterNumbersContainer" class="checkbox-list" style="max-height: 200px; overflow-y: auto; border: 1px solid #ced4da; padding: 10px; border-radius: 4px;">
+                <div class="text-muted">Select a Quarter Type first</div>
+            </div>
+        </div>
+
+        <!-- Occurrence Date -->
+        <div class="form-group">
+            <label class="control-label">Occupying/Vacating Date</label>
+            @Html.TextBoxFor(m => m.occdate, new { @class = "form-control", type = "date" })
+        </div>
+
+        <!-- Remarks -->
+        <div class="form-group">
+            <label class="control-label">Remarks</label>
+            @Html.TextAreaFor(m => m.rem, new { @class = "form-control", rows = "3" })
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-group create-center-button">
+            <input type="submit" value="Save" class="btn btn-primary" />
+            @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    }
+</div>
+
+<style>
+    .checkbox-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        padding: 8px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+        .checkbox-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .checkbox-item.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+    .selection-count {
+        font-size: 12px;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+
+    /* Optional colors for label text */
+    .text-success {
+        color: #28a745 !important;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        let selectedQtrValue = "";
+
+    $(document).ready(function() {
+        // Serialize the ViewBag.QtrTypes using Json.Encode (built-in method)
+        var qtrTypes = @Html.Raw(Json.Encode(ViewBag.QtrTypes));
+
+        // Log the quarter types to the browser console
+        console.log("Quarter Types: ", qtrTypes);
+
+        // Log each quarter type individually
+        qtrTypes.forEach(function(item) {
+            console.log("Quarter Type - Code: " + item.Code + ", Description: " + item.Description);
+        });
+    });
+
+
+    document.getElementById("QtrTypeDropdown").addEventListener("change", function () {
+    selectedQtrValue = this.value; // store the selected value
+    const container = document.getElementById("QuarterNumbersContainer");
+
+    container.innerHTML = '<div class="text-muted">Loading quarter numbers...</div>';
+
+    if (selectedQtrValue) {
+    // Get current employee number from hidden input
+    const empNoInput = document.querySelector("input[name='empno']");
+    const currentEmpNo = empNoInput ? empNoInput.value : '';
+
+    fetch(`@Url.Action("GetPartsFast", "Admin")?qtrtype=${encodeURIComponent(selectedQtrValue)}&currentEmpNo=${encodeURIComponent(currentEmpNo)}`)
+    .then(res => {
+    if (!res.ok) throw new Error('Network response was not ok');
+    return res.json();
+    })
+    .then(parts => {
+    if (parts && parts.length > 0) {
+    container.innerHTML = '';
+
+    parts.forEach(part => {
+    const div = document.createElement("div");
+    div.className = "checkbox-item";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.name = "selectedParts";
+    checkbox.value = part.PartNumber;
+    checkbox.id = "qtr_" + part.PartNumber;
+
+    // Disable checkbox if occupied by someone else
+    if (part.Occupied && !part.IsCurrentUser) {
+    checkbox.disabled = true;
+    div.classList.add("disabled");
+    // Mark as occupied by other for logic to not re-enable on limit change
+    checkbox.setAttribute("data-occupied-by-other", "true");
+    }
+
+    checkbox.addEventListener('change', updateSelectionCount);
+
+    const label = document.createElement("label");
+    label.htmlFor = "qtr_" + part.PartNumber;
+    label.style.marginLeft = "5px";
+    label.style.cursor = checkbox.disabled ? "not-allowed" : "pointer";
+
+    let labelText = part.PartNumber;
+    if (part.Occupied) {
+    if (part.IsCurrentUser) {
+    labelText += ' (Currently assigned to you)';
+    label.classList.add('text-success');
+    } else {
+    labelText += ` (Occupied by ${part.OccupiedBy})`;
+    label.classList.add('text-danger');
+    }
+    }
+    label.textContent = labelText;
+
+    div.appendChild(checkbox);
+    div.appendChild(label);
+    container.appendChild(div);
+    });
+
+    // Add selection counter
+    const counter = document.createElement("div");
+    counter.className = "selection-count";
+    counter.id = "selectionCounter";
+    const limit = selectedQtrValue === "SA" ? 3 : 1;
+    counter.textContent = `Selected: 0/${limit}`;
+    container.appendChild(counter);
+
+    // Initialize the limit enforcement in case some are preselected (optional)
+    updateSelectionCount();
+    } else {
+    container.innerHTML = '<div class="text-muted">No quarter numbers available for this type</div>';
+    }
+    })
+    .catch(error => {
+    console.error('Error loading quarter parts:', error);
+    container.innerHTML = '<div class="text-danger">Error loading quarter numbers</div>';
+    displayError('Error loading quarter numbers. Please try again.');
+    });
+    } else {
+    container.innerHTML = '<div class="text-muted">Select a quarter type first</div>';
+    }
+    });
+
+    function updateSelectionCount() {
+    const checkboxes = document.querySelectorAll('#QuarterNumbersContainer input[type="checkbox"]');
+    const selected = Array.from(checkboxes).filter(cb => cb.checked);
+    const counter = document.getElementById("selectionCounter");
+
+    const limit = selectedQtrValue === "SA" ? 3 : 1;
+
+    if (counter) {
+    counter.textContent = `Selected: ${selected.length}/${limit}`;
+    }
+
+    // Enable/disable logic based on limit
+    if (selected.length >= limit) {
+    checkboxes.forEach(cb => {
+    if (!cb.checked && !cb.hasAttribute("data-occupied-by-other")) {
+    cb.parentElement.classList.add("disabled");
+    cb.disabled = true;
+    }
+    });
+    } else {
+    checkboxes.forEach(cb => {
+    if (!cb.checked && !cb.hasAttribute("data-occupied-by-other")) {
+    cb.parentElement.classList.remove("disabled");
+    cb.disabled = false;
+    }
+    });
+    }
+    }
+
+    // Prevent form submission if over the limit
+    document.querySelector('form').addEventListener('submit', function (e) {
+    const checkboxes = document.querySelectorAll('#QuarterNumbersContainer input[type="checkbox"]');
+    const selected = Array.from(checkboxes).filter(cb => cb.checked);
+    const limit = selectedQtrValue === "SA" ? 3 : 1;
+
+    if (selected.length > limit) {
+    e.preventDefault();
+    alert(`You can only select up to ${limit} quarter number${limit > 1 ? 's' : ''}.`);
+    }
+    });
+
+    // Function to display AJAX errors
+    function displayError(message) {
+    const errorContainer = document.getElementById('ajaxErrorContainer');
+    errorContainer.style.display = 'block';
+    errorContainer.innerHTML = `<div class="alert alert-danger">${message}</div>`;
+    }
+    </script>
+}

@@ -1,0 +1,1093 @@
+﻿:root {
+    --primary: #1a3a5f; /* Dark navy blue - official, trustworthy */
+    --secondary: #2c5e9e; /* Medium blue - professional, calm */
+    --accent: #4b7bec; /* Light blue - accents, highlights */
+    --success: #2e7d32; /* Forest green - success, approval */
+    --warning: #f57c00; /* Amber orange - warnings, attention */
+    --danger: #c62828; /* Brick red - errors, rejections */
+    --light: #f8f9fa; /* Off-white - backgrounds */
+    --dark: #2c3e50; /* Dark gray - text */
+    --border: #dee2e6; /* Light gray - borders */
+
+    --border-radius: 4px; /* Conservative rounded corners */
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadows */
+    --transition: all 0.2s ease;
+}
+
+/* ===== BASE STYLES ===== */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f5f7fa;
+    min-height: 100vh;
+    line-height: 1.5;
+    color: var(--dark);
+    padding: 20px;
+    font-size: 14px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+h2 {
+    border-bottom: 2px solid var(--secondary);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+/* ===== LAYOUT COMPONENTS ===== */
+.index-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+    .index-header h2 {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+/* ===== FORM STYLES ===== */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-control {
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 0.5rem 0.75rem;
+    font-size: 14px;
+    transition: var(--transition);
+    height: 38px;
+    width: 100%;
+    background: white;
+}
+
+    .form-control:focus {
+        border-color: var(--secondary);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(44, 94, 158, 0.1);
+    }
+
+select.form-control {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23555'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 12px;
+    padding-right: 2rem;
+}
+
+/* ===== BUTTON STYLES ===== */
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    transition: var(--transition);
+    font-size: 14px;
+    height: 38px;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    border-color: #6c757d;
+}
+
+.btn-success {
+    background: var(--success);
+    color: white;
+    border-color: var(--success);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+}
+
+.btn-warning {
+    background: var(--warning);
+    color: white;
+    border-color: var(--warning);
+}
+
+.btn-info {
+    background: var(--secondary);
+    color: white;
+    border-color: var(--secondary);
+}
+
+.btn-light {
+    background: var(--light);
+    color: var(--dark);
+    border-color: var(--border);
+}
+
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 12px;
+    height: 30px;
+}
+
+/* ===== TABLE STYLES ===== */
+.table {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--border);
+    margin-bottom: 1rem;
+    font-size: 13px;
+}
+
+    .table th {
+        background: var(--primary);
+        color: white;
+        padding: 0.75rem;
+        font-weight: 600;
+        text-align: left;
+        font-size: 13px;
+    }
+
+    .table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+    }
+
+        /* REDUCED ACTION COLUMN WIDTH */
+        .table td:last-child {
+            width: 50px; 
+            min-width: 50px;
+        }
+
+.table-striped tbody tr:nth-child(odd) {
+    background-color: #f8f9fa;
+}
+
+.table-striped tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+/* ===== ACTION BUTTONS ===== */
+.action-buttons {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+/* ===== ALERT STYLES ===== */
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    font-size: 13px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+
+
+/* ===== CARD STYLES ===== */
+.card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* ===== FORM HORIZONTAL LAYOUT ===== */
+.form-horizontal {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+    .form-horizontal .form-group {
+        margin-bottom: 0;
+    }
+
+.control-label {
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.25rem;
+    font-size: 13px;
+}
+
+/* ===== UTILITY CLASSES ===== */
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+.mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+.mt-2 {
+    margin-top: 0.5rem !important;
+}
+
+.ml-2 {
+    margin-left: 0.5rem !important;
+}
+
+.mx-2 {
+    margin: 0 0.5rem !important;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.p-3 {
+    padding: 1rem !important;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 15px;
+    }
+
+    .index-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+   
+
+    .table {
+        font-size: 12px;
+    }
+
+        .table th,
+        .table td {
+            padding: 0.5rem;
+        }
+
+            /* Further reduce action column on mobile */
+            .table td:last-child {
+                width: 150px;
+                min-width: 150px;
+            }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .table {
+        font-size: 11px;
+    }
+
+        .table td:last-child {
+            width: 120px;
+            min-width: 120px;
+        }
+
+    .btn-sm {
+        font-size: 11px;
+        padding: 0.2rem 0.4rem;
+        height: 26px;
+    }
+}
+
+/* ===== LOGIN PAGE SPECIFIC ===== */
+.login-container {
+    max-width: 400px;
+    margin: 50px auto;
+    background: white;
+    padding: 2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+    .login-container h2 {
+        text-align: center;
+        border-bottom: none;
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+    }
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+    }
+
+    .btn:hover {
+        transform: none !important;
+    }
+}
+
+/* ===== FOCUS INDICATORS FOR ACCESSIBILITY ===== */
+.btn:focus,
+.form-control:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
+}
+
+/* ===== ADD/EDIT EMPLOYEE BUTTONS ===== */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--border);
+}
+
+    .form-actions .btn {
+        min-width: 120px; /* Increased width for Save button */
+        justify-content: center;
+    }
+
+/* Back to list button styling */
+.btn-default {
+    background: var(--light);
+    color: var(--dark);
+    border: 1px solid var(--border);
+    min-width: 120px; /* Increased width */
+    text-decoration: none;
+}
+
+    .btn-default:hover {
+        background: #e9ecef;
+        border-color: var(--border);
+    }
+
+/* ===== UPDATE QUARTERS BUTTON CENTERING ===== */
+.quarter-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--border);
+}
+
+    .quarter-actions .btn {
+        min-width: 120px; /* Consistent button width */
+    }
+
+/* ===== SPECIFIC BUTTON WIDTH INCREASES ===== */
+.btn-primary,
+.btn-success,
+.btn-info {
+    min-width: 120px; /* Increased from default */
+}
+
+/* ===== FORM ACTION LAYOUT FIXES ===== */
+.form-horizontal .form-actions {
+    grid-column: 1 / -1; /* Span full width */
+    justify-content: flex-start; /* Align left for add/edit forms */
+}
+
+/* ===== UPDATE QUARTERS SPECIFIC STYLING ===== */
+#statusForm .form-group:last-child {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 768px) {
+    .form-actions,
+    .quarter-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+        .form-actions .btn,
+        .quarter-actions .btn {
+            width: 100%;
+            max-width: 200px;
+        }
+
+    .form-horizontal .form-actions {
+        justify-content: center;
+    }
+}
+
+/* ===== SPECIFIC PAGE ADJUSTMENTS ===== */
+/* Add/Edit Employee pages */
+.form-horizontal .col-md-offset-2 {
+    margin-left: 0;
+    width: 100%;
+}
+
+    .form-horizontal .col-md-offset-2 .col-md-4 {
+        width: auto;
+        display: flex;
+        gap: 1rem;
+    }
+
+/* Update Quarter Details page */
+#statusForm .btn-success {
+    margin: 0 auto;
+    display: block;
+}
+
+/* ===== WIDER FORM CONTROLS ===== */
+.form-control {
+    width: 100%;
+    max-width: 400px; /* Increased from default */
+    min-width: 300px; /* Minimum width for better appearance */
+}
+
+/* Specific wider controls for Add/Edit forms */
+.form-horizontal .form-control {
+    max-width: 500px; /* Even wider for form pages */
+    min-width: 350px;
+}
+
+/* Date inputs specifically */
+input[type="date"].form-control {
+    max-width: 500px;
+    min-width: 350px;
+}
+
+/* Select dropdowns */
+select.form-control {
+    max-width: 500px;
+    min-width: 350px;
+}
+
+/* Textareas */
+textarea.form-control {
+    max-width: 500px;
+    min-width: 350px;
+    min-height: 100px;
+}
+
+/* ===== CENTERED BUTTONS ===== */
+/* Add/Edit Employee pages */
+.form-actions {
+    display: flex;
+    justify-content: center; /* Center the buttons */
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--border);
+}
+
+/* Deactivate page buttons */
+.deactivate-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+/* Table action buttons center alignment */
+.action-buttons {
+    display: flex;
+    justify-content: center; /* Center table action buttons */
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Update Quarter buttons */
+.quarter-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* ===== CENTERED LOGIN BOX ===== */
+.login-container {
+    max-width: 400px;
+    margin: 100px auto; /* Center vertically and horizontally */
+    background: white;
+    padding: 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center contents */
+}
+
+    .login-container h2 {
+        text-align: center;
+        border-bottom: none;
+        margin-bottom: 2rem;
+        color: var(--primary);
+        width: 100%;
+    }
+
+    .login-container .form-group {
+        width: 100%;
+        max-width: 350px; /* Appropriate width for login */
+    }
+
+/*    .login-container .btn {
+        width: 100%;
+        max-width: 350px;
+        margin-top: 1rem;
+    }*/
+
+/* ===== SPECIFIC FORM LAYOUT IMPROVEMENTS ===== */
+/* Ensure form groups use full available space */
+.form-horizontal .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+}
+
+/* Label alignment */
+.control-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-align: left;
+    width: 100%;
+}
+
+/* Form horizontal layout adjustment */
+.form-horizontal .col-md-2 {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 0.5rem;
+}
+
+.form-horizontal .col-md-4 {
+    width: 100%;
+}
+
+/* ===== BUTTON SIZING CONSISTENCY ===== */
+.btn {
+    min-width: 120px;
+    justify-content: center;
+}
+
+.btn-sm {
+    min-width: 80px; /* Slightly smaller for table actions */
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 768px) {
+    .form-control {
+        max-width: 100%;
+        min-width: auto;
+    }
+
+    .form-horizontal .form-control {
+        max-width: 100%;
+        min-width: auto;
+    }
+
+    .form-actions,
+    .deactivate-actions,
+    .quarter-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+        .form-actions .btn,
+        .deactivate-actions .btn,
+        .quarter-actions .btn {
+            width: 100%;
+            max-width: 250px;
+        }
+
+    .login-container {
+        margin: 50px auto;
+        padding: 2rem;
+        width: 90%;
+    }
+
+        .login-container .form-group {
+            max-width: 100%;
+        }
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        padding: 1.5rem;
+        margin: 30px auto;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+        .action-buttons .btn {
+            width: 100%;
+            max-width: 200px;
+        }
+}
+
+/* ===== SPECIFIC PAGE FIXES ===== */
+/* Ensure all form controls are consistent */
+input[type="text"].form-control,
+input[type="email"].form-control,
+input[type="tel"].form-control,
+input[type="number"].form-control,
+select.form-control,
+textarea.form-control {
+    width: 100%;
+    max-width: 500px;
+    min-width: 350px;
+}
+
+/* Readonly fields same width */
+.form-control[readonly] {
+    max-width: 500px;
+    min-width: 350px;
+}
+
+
+
+/* ===== LOGIN BUTTON CENTERING FIX ===== */
+.login-container form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-container .form-group {
+    width: 100%;
+    max-width: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-container .btn {
+    width: 100%;
+    max-width: 350px;
+    margin-top: 1rem;
+    align-self: center;
+}
+
+/* Specific targeting for login button */
+.login-container form .btn[type="submit"] {
+    width: 100%;
+    max-width: 350px;
+    margin: 1rem auto 0 auto;
+    display: block;
+}
+
+/* Ensure login form elements are centered */
+.login-container .form-control {
+    max-width: 350px;
+    min-width: 250px;
+    margin: 0 auto;
+}
+
+/* Login error message centering */
+.login-container .alert {
+    width: 100%;
+    max-width: 350px;
+    margin: 1rem auto;
+    text-align: center;
+}
+
+/* ===== FORM ACTIONS CENTERING FIX ===== */
+/* Force center alignment for form actions */
+.form-actions {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--border);
+    width: 100%;
+}
+
+/* Specific fix for Add/Edit form buttons */
+.form-horizontal .form-actions {
+    grid-column: 1 / -1;
+    justify-content: center !important;
+    margin-left: 0 !important;
+}
+
+/* Deactivate page button centering */
+.deactivate-actions {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 1rem;
+    width: 100%;
+}
+
+/* ===== TABLE ACTION BUTTONS CENTERING ===== */
+.action-buttons {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+/* ===== QUARTER BUTTONS CENTERING ===== */
+.quarter-actions {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 1rem;
+    width: 100%;
+}
+
+#statusForm .form-group:last-child {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 1rem;
+}
+
+/* ===== IMPORTANT OVERRIDES FOR CENTERING ===== */
+/* Force center alignment where needed */
+.center-buttons {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 1rem;
+    width: 100%;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.mx-auto {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* ===== SPECIFIC BUTTON CENTERING ===== */
+/* Login submit button */
+form[action="/Login/Index"] .btn {
+    display: block !important;
+    margin: 1rem auto 0 auto !important;
+    width: 100%;
+    max-width: 350px;
+}
+
+/* Add/Edit form buttons */
+.form-horizontal .btn-success,
+.form-horizontal .btn-default {
+    margin: 0 auto;
+}
+
+/* Deactivate form buttons */
+form[action*="DeactivateConfirmed"] {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+/* ===== FIX: KEEP ACTION BUTTONS IN ONE LINE ===== */
+.table td:last-child {
+    width: auto !important; /* Let it expand naturally */
+    min-width: 280px !important; /* Enough space for 3 buttons */
+    white-space: nowrap; /* Prevent line breaks */
+}
+
+/* Smaller buttons in tables */
+.table .btn-sm {
+    min-width: 70px !important; /* Reduce size so 3 fit in one line */
+    font-size: 12px;
+    padding: 0.3rem 0.6rem;
+}
+
+/* Ensure action-buttons stay inline */
+.action-buttons {
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important; /* or center if you prefer */
+}
+
+/* Container1 specific styling */
+.container1 {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Ensure navbar stays consistent with theme */
+.navbar-dark.bg-dark {
+    background-color: #1a3a5f !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+    .nav-link:hover {
+        color: #4b7bec !important; /* Light blue accent */
+    }
+
+/* NEW: Search section styling */
+.search-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    min-width: 300px;
+    flex-grow: 1;
+    max-width: 800px;
+}
+
+.results-count {
+    margin: 15px 0;
+    font-weight: bold;
+    color: #6c757d;
+}
+
+.pagination {
+    margin-top: 20px;
+    justify-content: center;
+}
+
+
+
+.form-row-inline {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.table td:last-child {
+    white-space: nowrap !important;
+    width: 160px !important;
+    min-width: 160px !important;
+}
+
+.action-buttons {
+    display: flex !important;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap !important;
+}
+
+.table .btn-sm {
+    min-width: 70px !important;
+    font-size: 12px;
+    padding: 0.3rem 0.6rem;
+}
+
+
+
+/* Buttons aligned inline */
+.button-wrapper {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+    .filter-row {
+        flex-direction: column;
+    }
+
+    .button-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+
+
+.index-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+
+
+/*.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+    .filter-form .form-group {
+        flex: 1 1 200px;
+        min-width: 150px;
+    }
+
+    .filter-form .button-group {
+        display: flex;
+        gap: 0.5rem;
+        flex: 0 0 auto;*/ /* Prevents it from growing too large */
+    /*}*/
+
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+    justify-content: flex-start;
+}
+
+    .filter-form .form-group {
+        flex: 1 1 200px;
+        min-width: 150px;
+    }
+
+    .filter-form .button-group {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0.5rem;
+        flex: 0 0 auto;
+        align-items: flex-end;
+    }
+
+
+.create-center-button {
+    display: flex;
+    justify-content: center; /* centers horizontally */
+    gap: 10px; /* space between buttons */
+    width: 100%; /* take full width */
+    margin-top: 20px; /* optional: spacing from above fields */
+}
+
+.remarks-box {
+    height: 38px;
+    resize: none;
+}
+
+.uniform-height {
+    height: 38px;
+}
+
+
+
+
+.login-container input.form-control,
+.login-container select.form-control {
+    width: 100% !important;
+    max-width: 350px !important;
+    min-width: 250px !important;
+    box-sizing: border-box;
+}
+.login-container select.form-control {
+    padding-right: 2rem !important;
+    background-position: right 0.75rem center !important;
+    background-size: 12px;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem; /* or any value that looks good visually */
+    display: block; /* ensures the label sits on its own line above the input */
+}
+
+
+.tiny-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

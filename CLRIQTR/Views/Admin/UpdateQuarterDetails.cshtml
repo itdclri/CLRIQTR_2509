@@ -1,0 +1,257 @@
+﻿@model CLRIQTR.Models.QtrUpd
+@{
+    ViewBag.Title = "Quarter Details";
+}
+
+<div class="container">
+    <h2 class="text-center">Quarters Details of Employee: @Model.empno</h2>
+
+    <!-- READONLY DETAILS -->
+    <div id="detailsCard" class="card p-3 mb-3">
+        <div class="row">
+            <!-- Left side (3 fields) -->
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label class="control-label">Quarter Status</label>
+                    <input type="text" class="form-control"
+                           value="@(Model.qtrstatus == "O" ? "Occupied" : Model.qtrstatus == "V" ? "Vacant" : Model.qtrstatus)" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Occupied Date</label>
+                    <input type="text" class="form-control"
+                           value="@(Model.occdate.HasValue ? Model.occdate.Value.ToString("yyyy-MM-dd") : "")" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Quarter Number</label>
+                    <input type="text" class="form-control" value="@Model.qtrno" readonly />
+                </div>
+            </div>
+
+            <!-- Right side (Remarks) -->
+            <div class="col-md-4">
+                <div class="form-group h-100 d-flex flex-column">
+                    <label class="control-label">Remarks</label>
+                    <textarea class="form-control flex-grow-1" rows="3" readonly>@Model.rem</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="quarter-actions mb-3 mt-3 text-end" id="buttonContainer">
+            <button type="button" class="btn btn-primary" id="editStatusBtn">Edit Quarter Status</button>
+            @Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-secondary ml-2", id = "backBtn" })
+        </div>
+    </div>
+
+    <!-- EDIT FORM (hidden initially) -->
+    <div id="statusForm" style="display:none;" class="mt-3">
+        @using (Html.BeginForm("UpdateQuarterDetails", "Admin", FormMethod.Post, new { @class = "card p-3" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.empno)
+            @Html.HiddenFor(m => m.qtrno)
+
+            <h4 class="text-center mb-3">Update Quarter Status</h4>
+
+            <!-- Current Quarter Number (Readonly, always visible) -->
+            <div class="form-group">
+                <label class="control-label">Current Quarter Number</label>
+                <input type="text" class="form-control" value="@Model.qtrno" readonly id="currentQtrNo" style="cursor:pointer;" />
+            </div>
+
+            <!-- New Quarter Type Dropdown (hidden initially) -->
+            <div class="form-group" id="newQuarterTypeGroup" style="display:none;">
+                <label class="control-label">New Quarter Type</label>
+                @Html.DropDownListFor(m => m.qtrtype,
+                         (SelectList)ViewBag.QtrTypes,
+                         "Select Quarter Type",
+                         new { @class = "form-control", id = "QtrTypeDropdown" })
+            </div>
+
+            <!-- New Quarter Numbers Checkbox List (hidden initially) -->
+            <div class="form-group" id="newQuarterNumbersGroup" style="display:none;">
+                <label class="control-label">New Quarter Numbers</label>
+                <div id="QuarterNumbersContainer" class="checkbox-list"
+                     style="max-height: 200px; overflow-y: auto; border: 1px solid #ced4da; padding: 10px; border-radius: 4px; width: 300px;">
+                    <div class="text-muted">Select a Quarter Type first</div>
+                </div>
+                @Html.ValidationMessage("selectedParts", "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="qtrstatus">Quarter Status</label>
+                @Html.DropDownList("qtrstatus", new List<SelectListItem> {
+                    new SelectListItem { Text = "Occupied", Value = "O", Selected = Model.qtrstatus == "O" },
+                    new SelectListItem { Text = "Vacant", Value = "V", Selected = Model.qtrstatus == "V" }
+                }, "Select Status", new { @class = "form-control" })
+                @Html.ValidationMessage("qtrstatus", "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="occdate">Occupying/Vacating Date</label>
+                @{
+                    var occdateValue = Model.occdate.HasValue ? Model.occdate.Value.ToString("yyyy-MM-dd") : "";
+                }
+                @Html.TextBoxFor(m => m.occdate, new { @class = "form-control", type = "date", Value = occdateValue })
+                @Html.ValidationMessageFor(m => m.occdate, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" for="FNAN">Forenoon / Afternoon</label>
+                @Html.DropDownListFor(m => m.FNAN,
+                         new List<SelectListItem> {
+                        new SelectListItem{ Text="Forenoon", Value="FN", Selected = Model.FNAN == "FN" },
+                        new SelectListItem{ Text="Afternoon", Value="AN", Selected = Model.FNAN == "AN" }
+                         },
+                         "Select Time",
+                         new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.FNAN, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="quarter-actions mb-3" id="buttonContainer">
+                <button type="submit" class="btn btn-primary">Confirm</button>
+                <button type="button" id="cancelEditBtn" class="btn btn-secondary">Cancel</button>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Error container for AJAX errors -->
+<div id="ajaxErrorContainer" class="alert alert-danger" style="display:none;"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const detailsCard = document.getElementById("detailsCard");
+        const statusForm = document.getElementById("statusForm");
+        const mainButtonContainer = document.querySelector(".quarter-actions.mb-3.mt-3.text-end");
+        const editStatusBtn = document.getElementById("editStatusBtn");
+        const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+        const newQuarterTypeGroup = document.getElementById("newQuarterTypeGroup");
+        const newQuarterNumbersGroup = document.getElementById("newQuarterNumbersGroup");
+        const qtrTypeDropdown = document.getElementById("QtrTypeDropdown");
+        const quarterNumbersContainer = document.getElementById("QuarterNumbersContainer");
+        const currentQtrNoInput = document.getElementById("currentQtrNo");
+
+        // Show edit form on Edit button click
+        editStatusBtn.addEventListener("click", function () {
+            detailsCard.style.display = "none";
+            statusForm.style.display = "block";
+            mainButtonContainer.style.display = "none";
+
+            // Keep new quarter type/groups hidden initially
+            newQuarterTypeGroup.style.display = "none";
+            newQuarterNumbersGroup.style.display = "none";
+        });
+
+        // Cancel edit: revert to read-only view
+        cancelEditBtn.addEventListener("click", function () {
+            detailsCard.style.display = "block";
+            statusForm.style.display = "none";
+            mainButtonContainer.style.display = "flex";
+
+            newQuarterTypeGroup.style.display = "none";
+            newQuarterNumbersGroup.style.display = "none";
+        });
+
+        // Clicking the readonly current quarter number toggles visibility of new quarter type and numbers groups
+        currentQtrNoInput.addEventListener("click", function () {
+            const isVisible = newQuarterTypeGroup.style.display === "block";
+
+            if (isVisible) {
+                newQuarterTypeGroup.style.display = "none";
+                newQuarterNumbersGroup.style.display = "none";
+            } else {
+                newQuarterTypeGroup.style.display = "block";
+                newQuarterNumbersGroup.style.display = "block";
+
+                // Load quarter parts if a type is already selected
+                const selectedType = qtrTypeDropdown.value;
+                if (selectedType) {
+                    loadQuarterParts(selectedType);
+                } else {
+                    quarterNumbersContainer.innerHTML = '<div class="text-muted">Select a Quarter Type first</div>';
+                }
+            }
+        });
+
+        // On quarter type dropdown change, load quarter numbers dynamically
+        qtrTypeDropdown.addEventListener("change", function () {
+            const selectedType = this.value;
+            if (selectedType) {
+                loadQuarterParts(selectedType);
+            } else {
+                quarterNumbersContainer.innerHTML = '<div class="text-muted">Select a Quarter Type first</div>';
+            }
+        });
+
+        // Function to load quarter parts dynamically
+        function loadQuarterParts(qtrtype) {
+            // Show loading message
+            quarterNumbersContainer.innerHTML = '<div class="text-muted">Loading quarter numbers...</div>';
+
+            // Get current employee number
+            const empNoInput = document.querySelector("input[name='empno']");
+            const currentEmpNo = empNoInput ? empNoInput.value : '';
+
+            // Fetch parts data
+            fetch(`@Url.Action("GetPartsFast", "Admin")?qtrtype=${encodeURIComponent(qtrtype)}&currentEmpNo=${encodeURIComponent(currentEmpNo)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(parts => {
+                    if (parts && parts.length > 0) {
+                        let html = '';
+                        parts.forEach(part => {
+                            const isOccupied = part.Occupied;
+                            const isCurrentUser = part.IsCurrentUser;
+                            const occupiedBy = part.OccupiedBy;
+
+                            let statusText = '';
+                            let textClass = '';
+
+                            if (isOccupied) {
+                                if (isCurrentUser) {
+                                    statusText = ' (Currently assigned to you)';
+                                    textClass = 'text-success';
+                                } else {
+                                    statusText = ` (Occupied by ${occupiedBy})`;
+                                    textClass = 'text-danger';
+                                }
+                            }
+
+                            html += `
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selectedParts"
+                                           value="${part.PartNumber}" id="part_${part.PartNumber}"
+                                           ${isOccupied && !isCurrentUser ? 'disabled' : ''}>
+                                    <label class="form-check-label ${textClass}" for="part_${part.PartNumber}">
+                                        ${part.PartNumber}${statusText}
+                                    </label>
+                                </div>
+                            `;
+                        });
+                        quarterNumbersContainer.innerHTML = html;
+                    } else {
+                        quarterNumbersContainer.innerHTML = '<div class="text-muted">No quarter numbers available for this type</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading quarter parts:', error);
+                    quarterNumbersContainer.innerHTML = '<div class="text-danger">Error loading quarter numbers</div>';
+                    displayError('Failed to load quarter parts. Please try again later.');
+                });
+        }
+
+        // Function to display AJAX errors
+        function displayError(message) {
+            const errorContainer = document.getElementById('ajaxErrorContainer');
+            errorContainer.style.display = 'block';
+            errorContainer.innerHTML = `<div class="alert alert-danger">${message}</div>`;
+        }
+    });
+</script>

@@ -191,7 +191,7 @@
 
     </div>
 
-    <fieldset class="scheduler-border">
+    @*<fieldset class="scheduler-border">
         <br />
         <legend class="scheduler-border">Family Details</legend>
         <br />
@@ -243,7 +243,7 @@
                 </button>
             </div>
         </div>
-    </div>
+    </div>*@
 
 
 
@@ -258,55 +258,171 @@
 
 
 
+<hr />
+
+<fieldset class="scheduler-border">
+    <br />
+    <legend class="scheduler-border">Family Details Management</legend>
+    <br />
+    <br />
+    <table class="table table-bordered" id="dependentsTable">
+        <thead>
+            <tr>
+                <th>Relation Type</th>
+                <th>Name</th>
+                <th style="width: 150px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var dep in Model.Dependents)
+            {
+                <tr data-id="@dep.Id" data-empno="@Model.EmpNo">
+                    <td data-typeid="@dep.DependentTypeId">
+                        @(((SelectList)ViewBag.DependentTypes).First(x => x.Value == dep.DependentTypeId.ToString()).Text)
+                    </td>
+                    <td>@dep.Name</td>
+                    <td>
+                        <button class="btn btn-sm btn-info edit-btn">Edit</button>
+                        <button class="btn btn-sm btn-danger delete-btn">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button id="addNewDependentBtn" class="btn btn-success">
+        <i class="fa fa-plus"></i> Add New Dependent
+    </button>
+</fieldset>
+
+
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
-
     <script>
-        $(document).ready(function () {
-            // Client-side date validation
-            $('#DOJ_dt').change(function () {
-                var dob = new Date($('#DOB_dt').val());
-                var doj = new Date($('#DOJ_dt').val());
+    $(document).ready(function () {
+        const tableBody = $('#dependentsTable tbody');
 
-                if (dob && doj && doj < dob) {
-                    alert('Date of Joining cannot be before Date of Birth');
-                    $('#DOJ_dt').val('');
-                }
+        // Store the dependent types list in a JavaScript variable
+        const dependentTypes = @Html.Raw(Json.Encode(ViewBag.DependentTypes));
+
+        function buildDropdown(selectedValue) {
+            let dropdown = '<select class="form-control">';
+            dropdown += '<option value="">-- Select Type --</option>';
+            dependentTypes.forEach(function(type) {
+                const isSelected = type.Value == selectedValue ? ' selected' : '';
+                dropdown += `<option value="${type.Value}"${isSelected}>${type.Text}</option>`;
             });
+            dropdown += '</select>';
+            return dropdown;
+        }
 
-            $('#DOR_dt').change(function () {
-                var doj = new Date($('#DOJ_dt').val());
-                var dor = new Date($('#DOR_dt').val());
+        // --- Event Handler for Edit Button ---
+        tableBody.on('click', '.edit-btn', function () {
+            const row = $(this).closest('tr');
+            const typeCell = row.find('td:eq(0)');
+            const nameCell = row.find('td:eq(1)');
 
-                if (doj && dor && dor < doj) {
-                    alert('Date of Superannuation cannot be before Date of Joining');
-                    $('#DOR_dt').val('');
-                }
-            });
+            const currentTypeId = typeCell.data('typeid');
+            const currentName = nameCell.text().trim();
 
-            var activeChanged = false;
+            typeCell.html(buildDropdown(currentTypeId));
+            nameCell.html(`<input type="text" class="form-control" value="${currentName}" />`);
 
-            $('#Active').change(function () {
-                activeChanged = true;
-                $('#DOR_dt').val('');
-                $('#dor-error').hide(); // hide error when changing active
-            });
-
-            $('form').submit(function (e) {
-                if (activeChanged) {
-                    var dor = $('#DOR_dt').val();
-                    if (!dor) {
-                        e.preventDefault();
-                        $('#dor-error').show();
-                        $('#DOR_dt').focus();
-                        return false;
-                    } else {
-                        $('#dor-error').hide();
-                    }
-                }
-            });
-
-
+            $(this).removeClass('edit-btn btn-info').addClass('save-btn btn-success').text('Save');
+            row.find('.delete-btn').removeClass('delete-btn btn-danger').addClass('cancel-btn btn-warning').text('Cancel');
         });
+
+        // --- Event Handler for Cancel Button ---
+        tableBody.on('click', '.cancel-btn', function () {
+            const row = $(this).closest('tr');
+            const typeCell = row.find('td:eq(0)');
+            const nameCell = row.find('td:eq(1)');
+
+            const originalTypeId = typeCell.data('typeid');
+            // Find the text for the original type ID
+            const originalTypeName = dependentTypes.find(t => t.Value == originalTypeId)?.Text || '';
+
+            typeCell.html(originalTypeName);
+            nameCell.html(row.find('input').val()); // Keep the latest value for now, or revert if needed
+
+            $(this).removeClass('cancel-btn btn-warning').addClass('delete-btn btn-danger').text('Delete');
+            row.find('.save-btn').removeClass('save-btn btn-success').addClass('edit-btn btn-info').text('Edit');
+        });
+
+        // --- Event Handler for Save (Update/Insert) Button ---
+        tableBody.on('click', '.save-btn', function () {
+            const row = $(this).closest('tr');
+            const id = row.data('id');
+            const empNo = row.data('empno');
+            const typeId = row.find('select').val();
+            const name = row.find('input').val();
+            const typeText = row.find('select option:selected').text();
+
+            if (!typeId || !name) {
+                alert('Please select a type and enter a name.');
+                return;
+            }
+
+            const isNew = !id; // If there is no data-id, it's a new record
+            const url = isNew ? '@Url.Action("AddDependent", "Admin")' : '@Url.Action("UpdateDependent", "Admin")';
+            const data = {
+                Id: id,
+                EmpNo: empNo,
+                DependentTypeId: typeId,
+                Name: name
+            };
+
+            console.log("Sending this data to controller:", data);
+
+
+            $.post(url, data, function(response) {
+                if (response.success) {
+                    row.find('td:eq(0)').html(typeText).data('typeid', typeId);
+                    row.find('td:eq(1)').html(name);
+                    row.find('.cancel-btn').removeClass('cancel-btn btn-warning').addClass('delete-btn btn-danger').text('Delete');
+                    row.find('.save-btn').removeClass('save-btn btn-success').addClass('edit-btn btn-info').text('Edit');
+
+                    if(isNew && response.dependent) {
+                        row.data('id', response.dependent.Id); // Set the new ID for future edits
+                    }
+                } else {
+                    alert('Error saving dependent: ' + response.message);
+                }
+            });
+        });
+
+        // --- Event Handler for Delete Button ---
+        tableBody.on('click', '.delete-btn', function () {
+            if (!confirm('Are you sure you want to delete this dependent?')) {
+                return;
+            }
+
+            const row = $(this).closest('tr');
+            const id = row.data('id');
+
+            $.post('@Url.Action("DeleteDependent", "Admin")', { id: id }, function(response) {
+                if (response.success) {
+                    row.fadeOut(300, function() { $(this).remove(); });
+                } else {
+                    alert('Error deleting dependent: ' + response.message);
+                }
+            });
+        });
+
+        // --- Event Handler for Add New Button ---
+        $('#addNewDependentBtn').on('click', function() {
+            const empNo = '@Model.EmpNo';
+            const newRow = `
+                <tr data-empno="${empNo}">
+                    <td>${buildDropdown('')}</td>
+                    <td><input type="text" class="form-control" placeholder="Enter Name" /></td>
+                    <td>
+                        <button class="btn btn-sm btn-success save-btn">Save</button>
+                        <button class="btn btn-sm btn-warning cancel-btn">Cancel</button>
+                    </td>
+                </tr>`;
+            tableBody.append(newRow);
+        });
+    });
     </script>
 }

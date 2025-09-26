@@ -263,6 +263,7 @@ namespace CLRIQTR.Controllers
                     // 2. Update the dependents (delete old ones, insert new ones)
                     _employeeRepo.UpdateDependents(emp.EmpNo, emp.Dependents);
 
+                  
                     TempData["Message"] = "Employee and dependents updated successfully!";
                     return RedirectToAction("Index");
                 }
@@ -581,6 +582,66 @@ namespace CLRIQTR.Controllers
             {
                 // Log the exception ex
                 return Json(new { success = false, message = "An error occurred while saving." });
+            }
+        }
+
+        [HttpPost]
+        public JsonResult AddDependent(DependentInputModel dependent)
+        {
+            // --- START DEBUGGING ---
+            if (dependent == null)
+            {
+                System.Diagnostics.Debug.WriteLine("DEBUG: The 'dependent' object received by the controller is NULL.");
+                return Json(new { success = false, message = "Server received null data." });
+            }
+
+            if (string.IsNullOrEmpty(dependent.EmpNo))
+            {
+                System.Diagnostics.Debug.WriteLine("DEBUG: The 'dependent' object is MISSING an EmpNo.");
+                return Json(new { success = false, message = "EmpNo is missing." });
+            }
+
+            System.Diagnostics.Debug.WriteLine($"DEBUG: Received Dependent - EmpNo: {dependent.EmpNo}, TypeId: {dependent.DependentTypeId}, Name: {dependent.Name}");
+            // --- END DEBUGGING ---
+
+            try
+            {
+                var newDependent = _employeeRepo.AddDependent(dependent);
+                return Json(new { success = true, dependent = newDependent });
+            }
+            catch (Exception ex)
+            {
+                // Log the full exception details
+                System.Diagnostics.Debug.WriteLine($"ERROR in AddDependent: {ex.ToString()}");
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public JsonResult UpdateDependent(DependentInputModel dependent)
+        {
+            try
+            {
+                _employeeRepo.UpdateDependent(dependent); // Repository method to update the record
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public JsonResult DeleteDependent(int id)
+        {
+            try
+            {
+                _employeeRepo.DeleteDependent(id); // Repository method to delete by primary key
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
             }
         }
 

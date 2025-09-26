@@ -29,5 +29,9 @@ namespace CLRIQTR.Data.Repositories.Interfaces
         List<DependentInputModel> GetDependentsByEmpNo(string empNo);
         void UpdateDependents(string empNo, List<DependentInputModel> dependents);
 
+        DependentInputModel AddDependent(DependentInputModel dependent);
+        void UpdateDependent(DependentInputModel dependent);
+        void DeleteDependent(int id);
+
     }
 }

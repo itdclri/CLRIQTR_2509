@@ -507,21 +507,21 @@ ON DUPLICATE KEY UPDATE
         /// <summary>
         /// Gets a list of all dependents for a specific employee.
         /// </summary>
-        public List<DependentInputModel> GetDependentsByEmpNo(string empNo)
-        {
-            // Use aliases (AS) to map table columns (depid, depname) directly to model properties
-            string sql = @"SELECT 
-                               depid AS DependentTypeId, 
-                               depname AS Name 
-                           FROM empdep 
-                           WHERE empno = @EmpNo;";
+        //public List<DependentInputModel> GetDependentsByEmpNo(string empNo)
+        //{
+        //    // Use aliases (AS) to map table columns (depid, depname) directly to model properties
+        //    string sql = @"SELECT 
+        //                       depid AS DependentTypeId, 
+        //                       depname AS Name 
+        //                   FROM empdep 
+        //                   WHERE empno = @EmpNo;";
 
-            using (var connection = new MySqlConnection(_connStr))
-            {
-                // Dapper maps the query result to a list of DependentInputModel
-                return connection.Query<DependentInputModel>(sql, new { EmpNo = empNo }).ToList();
-            }
-        }
+        //    using (var connection = new MySqlConnection(_connStr))
+        //    {
+        //        // Dapper maps the query result to a list of DependentInputModel
+        //        return connection.Query<DependentInputModel>(sql, new { EmpNo = empNo }).ToList();
+        //    }
+        //}
 
         // --- NEW: Implementation for UpdateDependents ---
 
@@ -573,6 +573,72 @@ ON DUPLICATE KEY UPDATE
                         throw; // Re-throw the exception to notify the controller
                     }
                 }
+            }
+        }
+
+        // 1. UPDATE your GetDependentsByEmpNo to select the primary key
+        //public List<DependentInputModel> GetDependentsByEmpNo(string empNo)
+        //{
+        //    // Make sure your empdep table has a primary key column named 'Id'
+        //    string sql = @"SELECT Id, depid AS DependentTypeId, depname AS Name 
+        //           FROM empdep 
+        //           WHERE empno = @EmpNo;";
+        //    using (var connection = new MySqlConnection(_connStr))
+        //    {
+        //        return connection.Query<DependentInputModel>(sql, new { EmpNo = empNo }).ToList();
+        //    }
+        //}
+
+        public List<DependentInputModel> GetDependentsByEmpNo(string empNo)
+        {
+            // ============================================================================
+            // FIX #2: THE SQL QUERY MUST SELECT THE 'Id' COLUMN.
+            // ============================================================================
+            string sql = @"SELECT 
+                       Id, 
+                       depid AS DependentTypeId, 
+                       depname AS Name 
+                   FROM empdep 
+                   WHERE empno = @EmpNo;";
+
+            using (var connection = new MySqlConnection(_connStr))
+            {
+                return connection.Query<DependentInputModel>(sql, new { EmpNo = empNo }).ToList();
+            }
+        }
+
+        // 2. ADD the new AddDependent method
+        public DependentInputModel AddDependent(DependentInputModel dependent)
+        {
+            string sql = @"INSERT INTO empdep (empno, depid, depname) 
+                   VALUES (@EmpNo, @DependentTypeId, @Name);
+                   SELECT LAST_INSERT_ID();"; // MySQL specific: get the new ID
+            using (var connection = new MySqlConnection(_connStr))
+            {
+                var newId = connection.QuerySingle<int>(sql, dependent);
+                dependent.Id = newId;
+                return dependent;
+            }
+        }
+
+        // 3. ADD the new UpdateDependent method
+        public void UpdateDependent(DependentInputModel dependent)
+        {
+            string sql = @"UPDATE empdep SET depid = @DependentTypeId, depname = @Name 
+                   WHERE Id = @Id;";
+            using (var connection = new MySqlConnection(_connStr))
+            {
+                connection.Execute(sql, dependent);
+            }
+        }
+
+        // 4. ADD the new DeleteDependent method
+        public void DeleteDependent(int id)
+        {
+            string sql = "DELETE FROM empdep WHERE Id = @Id;";
+            using (var connection = new MySqlConnection(_connStr))
+            {
+                connection.Execute(sql, new { Id = id });
             }
         }
 

@@ -21,14 +21,16 @@
                 <img src="@Url.Content("~/Content/Images/CSIR-Logo.jpg")" alt="CSIR Logo"
                      style="height:120px; width:auto; margin-right:20px;" />
 
-                <p class="text2 mb-0" style="color:white; font-size: 1rem; line-height: 1.4;">
-                    Council of Scientific &amp; Industrial Research (CSIR), <br>
-                    Ministry of Science and Technology, Govt of India
-                </p>
+                @Html.ActionLink("Quarters Management Admin Portal", "Index", "Admin", new { area = "" }, new { @class = "navbar-brand mx-3", style = "font-size: 1.4rem;" })
+
             </div>
 
             <!-- Center: Quarters Management link -->
-            @Html.ActionLink("Quarters Management Admin Portal", "Index", "Admin", new { area = "" }, new { @class = "navbar-brand mx-3", style = "font-size: 1.4rem;" })
+
+            <p class="text2 mb-0" style="color:white; font-size: 1.25rem; line-height: 1.4;">
+                CSIR - Central Leather Research Institute
+            </p>
+
 
             <!-- Right: right logo + logout button -->
 

@@ -1,0 +1,562 @@
+﻿@model CLRIQTR.Models.TentativeReportViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Final Priority List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+            .header img {
+                width: 80px;
+                height: auto;
+                margin-bottom: 10px;
+            }
+/*
+        .org-name {
+            font-size: 22px;
+            font-weight: bold;
+        }
+*/
+        .org-address {
+            font-size: 20px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        h2, .section-header {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 40px;
+            text-decoration: underline;
+            text-align: center;
+        }
+
+        .section-header {
+            text-decoration: none; /* Sub-headers don't need underline */
+            font-size: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+            word-wrap: break-word;
+            page-break-inside: avoid !important;
+        }
+
+        th {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        tr {
+            page-break-inside: avoid !important;
+        }
+
+        .note {
+            margin-top: 15px;
+            text-align: justify;
+            font-size: 15.25px;
+            line-height: 1.5;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .indent {
+            margin-left: 20px;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+
+        /* --- Print & PDF Specific Styles --- */
+        @@media print {
+            thead {
+                display: table-header-group;
+            }
+
+            tr {
+                page-break-inside: avoid !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="@Server.MapPath("~/Content/Images/CLRI-logo.png")" alt="CLRI logo" />
+        <div class="org-name">CSIR-CENTRAL LEATHER RESEARCH INSTITUTE</div>
+        <div class="org-address">Adyar, Chennai – 600020</div>
+    </div>
+
+    <h2>Final Priority List for Type I Quarter for the year 2025</h2>
+    @if (Model.TypeI.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 7%">S No</th>
+                    <th style="width: 25%">Name Shri/Ms/Dr.</th>
+                    <th style="width: 25%">Designation</th>
+                    <th style="width: 15%">Lab / Instt.</th>
+                    <th style="width: 15%">Date of joining CSIR</th>
+                    <th style="width: 13%">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TypeI)
+                {
+                    <tr>
+                        <td class="center">@item.SNo.</td>
+                        <td>@item.Name</td>
+                        <td>@item.Designation</td>
+                        <td>@item.LabInstitute</td>
+                        <td>@item.DateOfJoining</td>
+                        <td>@item.Remarks</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    { <p class="center">Nil Entitled Applicants</p>}
+
+    <h2>Final Priority List for Type II Quarter for the year 2025</h2>
+    @if (Model.TypeII.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 7%">S No</th>
+                    <th style="width: 28%">Name Shri/Ms/Dr.</th>
+                    <th style="width: 28%">Designation</th>
+                    <th style="width: 12%">Lab / Instt.</th>
+                    <th style="width: 15%">Date of joining CSIR</th>
+                    <th style="width: 10%">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TypeII)
+                {
+                    <tr>
+                        <td class="center">@item.SNo.</td>
+                        <td>@item.Name</td>
+                        <td>@item.Designation</td>
+                        <td>@item.LabInstitute</td>
+                        <td>@item.DateOfJoining</td>
+                        <td>@Html.Raw(item.Remarks.Replace("\n", "<br/>"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    { <p class="center">Nil Entitled Applicants</p>}
+
+    <div class="section-header">Final Priority List for SC for Type II Quarter for the year 2025</div>
+    @if (Model.TypeIISC.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 7%">S No</th>
+                    <th style="width: 28%">Name Shri/Ms/Dr.</th>
+                    <th style="width: 28%">Designation</th>
+                    <th style="width: 12%">Lab / Instt.</th>
+                    <th style="width: 15%">Date of joining CSIR</th>
+                    <th style="width: 10%">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TypeIISC)
+                {
+                    <tr>
+                        <td class="center">@item.SNo.</td>
+                        <td>@item.Name</td>
+                        <td>@item.Designation</td>
+                        <td>@item.LabInstitute</td>
+                        <td>@item.DateOfJoining</td>
+                        <td>@Html.Raw(item.Remarks.Replace("\n", "<br/>"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    { <p class="center">Nil Entitled Applicants</p>}
+
+    <div class="note">
+        <p><strong>Note:</strong> Allotment of a residence to an applicant who owns a house in either in his/her name or in the name of his/her spouse either severally or jointly within the Municipal limits or within a radius of 8 km of the Lab./Instt. whichever is more, will be made subject to the provisions as contained in Rule 7.0 of CSIR (Residence Allotment) Rules, 2022. The priority date is determined as per Rule 2.0 (n)(i) of CSIR (Residence Allotment) Rules, 2022.</p>
+        <p class="bold">(*) Subject to verification of Annual Property Returns.</p>
+        <p><strong>Rule 7.1 of CSIR (Residence Allotment) Rules, 2022:</strong> An employee shall not be eligible for allotment of Council accommodation if he constructs or purchases a residence at the place of his posting, by taking HBA (House Building Advance) from the Council within the municipal limits of Greater Chennai Corporation subject to verification of Annual Property Returns.</p>
+        <p><strong>Rule 7.6 of CSIR (Residence Allotment) Rules, 2022:</strong> The provisions of Rules 7.1, 7.2 and 7.3 shall not be applicable to the Head of the laboratory/Institute, the senior most Scientist, Sr. COA, COA, AO, Sr. COFA, COFA, FAO, Sr. COSP, COSP, SPO, Medical Officer, Nursing Sister, Security Officer and any other staff declared as essential by the Head of the Laboratory/Institute, on the recommendation of the Residence Allotment Committee.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="header">
+        <img src="@Server.MapPath("~/Content/Images/CLRI-logo.png")" alt="CLRI logo" />
+        <div class="org-name">CSIR-CENTRAL LEATHER RESEARCH INSTITUTE</div>
+        <div class="org-address">Adyar, Chennai – 600020</div>
+    </div>
+
+    <h2>Final Priority List for Type III Quarter for the year 2025</h2>
+    @if (Model.TypeIII.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 7%">S No</th>
+                    <th style="width: 22%">Name Shri/Ms/Dr.</th>
+                    <th style="width: 22%">Designation</th>
+                    <th style="width: 12%">Lab / Instt.</th>
+                    <th style="width: 15%">Date of joining CSIR</th>
+                    <th style="width: 12%">Date of Birth</th>
+                    <th style="width: 10%">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TypeIII)
+                {
+                    <tr>
+                        <td class="center">@item.SNo.</td>
+                        <td>@item.Name</td>
+                        <td>@item.Designation</td>
+                        <td>@item.LabInstitute</td>
+                        <td>@item.DateOfJoining</td>
+                        <td>@item.DateOfBirth</td>
+                        <td>@Html.Raw(item.Remarks.Replace("\n", "<br/>"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    { <p class="center">Nil Entitled Applicants</p>}
+
+    <div class="section-header">Final Priority List for SC for Type III Quarter for the year 2025</div>
+    @if (Model.TypeIIISC.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 7%">S No</th>
+                    <th style="width: 25%">Name Shri/Ms/Dr.</th>
+                    <th style="width: 25%">Designation</th>
+                    <th style="width: 10%">Lab / Instt.</th>
+                    <th style="width: 15%">Date of joining CSIR</th>
+                    <th style="width: 18%">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TypeIIISC)
+                {
+                    <tr>
+                        <td class="center">@item.SNo.</td>
+                        <td>@item.Name</td>
+                        <td>@item.Designation</td>
+                        <td>@item.LabInstitute</td>
+                        <td>@item.DateOfJoining</td>
+                        <td>@Html.Raw(item.Remarks.Replace("\n", "<br/>"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    { <p class="center">Nil Entitled Applicants</p>}
+
+    <div class="section-header">Final Priority List for ST for Type III Quarter for the year 2025</div>
+    @if (Model.TypeIIIST.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 7%">S No</th>
+                    <th style="width: 25%">Name Shri/Ms/Dr.</th>
+                    <th style="width: 25%">Designation</th>
+                    <th style="width: 10%">Lab / Instt.</th>
+                    <th style="width: 15%">Date of joining CSIR</th>
+                    <th style="width: 18%">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TypeIIIST)
+                {
+                    <tr>
+                        <td class="center">@item.SNo.</td>
+                        <td>@item.Name</td>
+                        <td>@item.Designation</td>
+                        <td>@item.LabInstitute</td>
+                        <td>@item.DateOfJoining</td>
+                        <td>@Html.Raw(item.Remarks.Replace("\n", "<br/>"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    { <p class="center">Nil Entitled Applicants</p>}
+
+    <div class="note">
+        <p><strong>Note:</strong> Allotment of a residence to an applicant who owns a house in either in his/her name or in the name of his/her spouse either severally or jointly within the Municipal limits or within a radius of 8 km of the Lab./Instt. whichever is more, will be made subject to the provisions as contained in Rule 7.0 of CSIR (Residence Allotment) Rules, 2022. *The priority date is determined as per Rule 2.0 (n)(i) of CSIR (Residence Allotment) Rules, 2022.</p>
+        <p class="bold">(*) Subject to verification of Annual Property Returns.</p>
+        <p><strong>Rule 7.1 of CSIR (Residence Allotment) Rules, 2022:</strong> An employee shall not be eligible for allotment of Council accommodation if he constructs or purchases a residence at the place of his posting, by taking HBA (House Building Advance) from the Council within the municipal limits of Greater Chennai Corporation subject to verification of Annual Property Returns.</p>
+        <p><strong>Rule 7.6 of CSIR (Residence Allotment) Rules, 2022:</strong> The provisions of Rules 7.1, 7.2 and 7.3 shall not be applicable to the Head of the laboratory/Institute, the senior most Scientist, Sr. COA, COA, AO, Sr. COFA, COFA, FAO, Sr. COSP, COSP, SPO, Medical Officer, Nursing Sister, Security Officer and any other staff declared as essential by the Head of the Laboratory/Institute, on the recommendation of the Residence Allotment Committee.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="header">
+        <img src="@Server.MapPath("~/Content/Images/CLRI-logo.png")" alt="CLRI logo" />
+        <div class="org-name">CSIR-CENTRAL LEATHER RESEARCH INSTITUTE</div>
+        <div class="org-address">Adyar, Chennai – 600020</div>
+    </div>
+
+    <h2>Final Priority List for Type IV Quarter for the year 2025</h2>
+    @if (Model.TypeIV.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 7%">S No</th>
+                    <th style="width: 25%">Name Shri/Ms/Dr.</th>
+                    <th style="width: 25%">Designation</th>
+                    <th style="width: 10%">Lab / Instt.</th>
+                    <th style="width: 15%">Date of joining CSIR</th>
+                    <th style="width: 18%">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TypeIV)
+                {
+                    <tr>
+                        <td class="center">@item.SNo.</td>
+                        <td>@item.Name</td>
+                        <td>@item.Designation</td>
+                        <td>@item.LabInstitute</td>
+                        <td>@item.DateOfJoining</td>
+                        <td>@Html.Raw(item.Remarks.Replace("\n", "<br/>"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    { <p class="center">Nil Entitled Applicants</p>}
+
+    <div class="section-header">Final Priority List for SC for Type IV Quarter for the year 2025</div>
+    @if (Model.TypeIVSC.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 7%">S No</th>
+                    <th style="width: 25%">Name Shri/Ms/Dr.</th>
+                    <th style="width: 25%">Designation</th>
+                    <th style="width: 10%">Lab / Instt.</th>
+                    <th style="width: 15%">Date of joining CSIR</th>
+                    <th style="width: 18%">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TypeIVSC)
+                {
+                    <tr>
+                        <td class="center">@item.SNo.</td>
+                        <td>@item.Name</td>
+                        <td>@item.Designation</td>
+                        <td>@item.LabInstitute</td>
+                        <td>@item.DateOfJoining</td>
+                        <td>@Html.Raw(item.Remarks.Replace("\n", "<br/>"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    { <p class="center">Nil Entitled Applicants</p>}
+
+    <div class="section-header">Final Priority List for ST for Type IV Quarter for the year 2025</div>
+    @if (Model.TypeIVST.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 7%">S No</th>
+                    <th style="width: 25%">Name Shri/Ms/Dr.</th>
+                    <th style="width: 25%">Designation</th>
+                    <th style="width: 10%">Lab / Instt.</th>
+                    <th style="width: 15%">Date of joining CSIR</th>
+                    <th style="width: 18%">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TypeIVST)
+                {
+                    <tr>
+                        <td class="center">@item.SNo.</td>
+                        <td>@item.Name</td>
+                        <td>@item.Designation</td>
+                        <td>@item.LabInstitute</td>
+                        <td>@item.DateOfJoining</td>
+                        <td>@Html.Raw(item.Remarks.Replace("\n", "<br/>"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    { <p class="center">Nil Entitled Applicants</p>}
+
+    <div class="note">
+        <p><strong>Note:</strong> Allotment of a residence to an applicant who owns a house in either in his/her name or in the name of his/her spouse either severally or jointly within the Municipal limits or within a radius of 8 km of the Lab./Instt. whichever is more, will be made subject to the provisions as contained in Rule 7.0 of CSIR (Residence Allotment) Rules, 2022. *The priority date is determined as per Rule 2.0 (n)(i) of CSIR (Residence Allotment) Rules, 2022.</p>
+        <p class="bold">(*) Subject to verification of Annual Property Returns.</p>
+        <p><strong>Rule 7.1 of CSIR (Residence Allotment) Rules, 2022:</strong> An employee shall not be eligible for allotment of Council accommodation if he constructs or purchases a residence at the place of his posting, by taking HBA (House Building Advance) from the Council within the municipal limits of Greater Chennai Corporation subject to verification of Annual Property Returns.</p>
+        <p><strong>Rule 7.6 of CSIR (Residence Allotment) Rules, 2022:</strong> The provisions of Rules 7.1, 7.2 and 7.3 shall not be applicable to the Head of the laboratory/Institute, the senior most Scientist, Sr. COA, COA, AO, Sr. COFA, COFA, FAO, Sr. COSP, COSP, SPO, Medical Officer, Nursing Sister, Security Officer and any other staff declared as essential by the Head of the Laboratory/Institute, on the recommendation of the Residence Allotment Committee.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="header">
+        <img src="@Server.MapPath("~/Content/Images/CLRI-logo.png")" alt="CLRI logo" />
+        <div class="org-name">CSIR-CENTRAL LEATHER RESEARCH INSTITUTE</div>
+        <div class="org-address">Adyar, Chennai – 600020</div>
+    </div>
+
+    <h2>Final Priority List for Type V Quarter for the year 2025</h2>
+    @if (Model.TypeV.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 7%">S No</th>
+                    <th style="width: 20%">Name Shri/Ms/Dr.</th>
+                    <th style="width: 20%">Designation</th>
+                    <th style="width: 10%">Lab / Instt.</th>
+                    <th style="width: 10%">Pay Level</th>
+                    <th style="width: 15%">Priority Date</th>
+                    <th style="width: 18%">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TypeV)
+                {
+                    <tr>
+                        <td class="center">@item.SNo.</td>
+                        <td>@item.Name</td>
+                        <td>@item.Designation</td>
+                        <td>@item.LabInstitute</td>
+                        <td class="center">@item.PayLevel</td>
+                        <td>@item.PriorityDate</td>
+                        <td>@item.Remarks</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    { <p class="center">Nil Entitled Applicants</p>}
+
+    <div class="note">
+        <p><strong>The Priority date is determined as per Rule 2.0 (n)(i)(c) and Rule 3.4 of CSIR (Residence Allotment) Rules, 2022.</strong></p>
+        <p><strong>Note 1:</strong> Allotment of a residence to an applicant who owns a house in either in his/her name or in the name of his/her spouse either severally or jointly within the Municipal limits or within a radius of 8 km of the Lab./Instt. whichever is more, will be made subject to the provisions as contained in Rule 7.0 of CSIR (Residence Allotment) Rules, 2022.</p>
+        <p><strong>Note 2:</strong> The date of priority in respect of the higher accommodation i.e. Type-V & above shall be determined on the basis of date from which the applicant has been continuously eligible for the type of accommodation as per level of the applicant in the pay matrix. The inter-se seniority for the higher type accommodation shall be considered on the basis of following factors, namely:</p>
+        <div class="indent">
+            <p>I. Where the Priority date of two or more applicants is the same, the applicant having a higher level in the pay matrix shall be senior in the waiting list;</p>
+            <p>II. Where the Priority date and level in pay matrix of two or more applicants is the same, the applicants having a higher level pay in the level shall be senior in the waiting list;</p>
+            <p>III. Where the date of priority, level in the pay matrix and pay in the level of two or more applicants are the same, the applicant who has joined the Council service earlier shall be senior in the waiting list; and</p>
+            <p>IV. Where the date of priority, level in the matrix, pay in the level and date of joining the council service of two or more applicants is the same, the applicant retiring earlier shall be accorded priority over the applicant retiring later.</p>
+        </div>
+        <p class="bold">(*) Subject to verification of Annual Property Returns.</p>
+        <p><strong>Rule 7.1 of CSIR (Residence Allotment) Rules, 2022:</strong> An employee shall not be eligible for allotment of Council accommodation if he constructs or purchases a residence at the place of his posting, by taking HBA (House Building Advance) from the Council within the municipal limits of Greater Chennai Corporation subject to verification of Annual Property Returns.</p>
+        <p><strong>Rule 7.6 of CSIR (Residence Allotment) Rules, 2022:</strong> The provisions of Rules 7.1, 7.2 and 7.3 shall not be applicable to the Head of the laboratory/Institute, the senior most Scientist, Sr. COA, COA, AO, Sr. COFA, COFA, FAO, Sr. COSP, COSP, SPO, Medical Officer, Nursing Sister, Security Officer and any other staff declared as essential by the Head of the Laboratory/Institute, on the recommendation of the Residence Allotment Committee.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="header">
+        <img src="@Server.MapPath("~/Content/Images/CLRI-logo.png")" alt="CLRI logo" />
+        <div class="org-name">CSIR-CENTRAL LEATHER RESEARCH INSTITUTE</div>
+        <div class="org-address">Adyar, Chennai – 600020</div>
+    </div>
+
+    <h2>Final Priority List for Type SA Quarter for the year 2025</h2>
+    @if (Model.TypeSA.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 7%">S No</th>
+                    <th style="width: 25%">Name Shri/Ms/Dr.</th>
+                    <th style="width: 25%">Designation</th>
+                    <th style="width: 10%">Lab / Instt.</th>
+                    <th style="width: 15%">Date of joining CSIR</th>
+                    <th style="width: 18%">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TypeSA)
+                {
+                    <tr>
+                        <td class="center">@item.SNo.</td>
+                        <td>@item.Name</td>
+                        <td>@item.Designation</td>
+                        <td>@item.LabInstitute</td>
+                        <td>@item.DateOfJoining</td>
+                        <td>@item.Remarks</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    { <p class="center">Nil Entitled Applicants</p>}
+
+    <div class="note">
+        <p><strong>Note:</strong> As per Rule 3.2.1 of CSIR (RA) Rules, 2022, If the Scientists in Group IV are either not available or are not willing to avail allotment, the apartment may be allotted to the following categories of employees in terms of Rule 2.0(n)(i)(d):</p>
+        <div class="indent">
+            <p>a) CSIR Fellows appointed under Quick Hire Scheme.</p>
+            <p>b) Emeritus Scientists / Research Associates / Senior Research Associates (Pool Officers)</p>
+            <p>c) Research Fellows (including Research Fellows in projects sponsored by Departments like DBT, DST etc.) / Research Interns (for whom hostel accommodation is not available).</p>
+            <p>d) Technical Officers in Group III in Level 7 in Pay Matrix and above.</p>
+            <p>e) Officers of the level of Section Officers and above from non-technical Cadre.</p>
+            <p>f) The employees staying in staff quarters are not eligible to apply for Scientist Apartment. Since, the Scientist Apartment is a transit accommodation.</p>
+        </div>
+        <p class="bold">(*) Subject to verification of Annual Property Returns.</p>
+        <p><strong>Rule 7.1 of CSIR (Residence Allotment) Rules, 2022:</strong> An employee shall not be eligible for allotment of Council accommodation if he constructs or purchases a residence at the place of his posting, by taking HBA (House Building Advance) from the Council within the municipal limits of Greater Chennai Corporation subject to verification of Annual Property Returns.</p>
+        <p><strong>Rule 7.6 of CSIR (Residence Allotment) Rules, 2022:</strong> The provisions of Rules 7.1, 7.2 and 7.3 shall not be applicable to the Head of the laboratory/Institute, the senior most Scientist, Sr. COA, COA, AO, Sr. COFA, COFA, FAO, Sr. COSP, COSP, SPO, Medical Officer, Nursing Sister, Security Officer and any other staff declared as essential by the Head of the Laboratory/Institute, on the recommendation of the Residence Allotment Committee.</p>
+    </div>
+
+</body>
+</html>

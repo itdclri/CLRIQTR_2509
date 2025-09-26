@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -91,7 +92,7 @@ namespace CLRIQTR.Models
         public string EnteredIP { get; set; }
 
         //public string CatNew { get; set; }
-         
+
 
         // ========== DateTime Properties for View ==========
         [Required(ErrorMessage = "Date of Birth is required")]
@@ -114,7 +115,7 @@ namespace CLRIQTR.Models
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? DOR_dt { get; set; }
 
-   
+
         [NotMapped]
         public string QtrNo { get; set; }
 
@@ -130,7 +131,73 @@ namespace CLRIQTR.Models
         [NotMapped]
         public string Password { get; set; }
 
+        //public EmpDepDtls FamilyDetails { get; set; }
 
+        public string FamilyStatus { get; set; }
+
+        // This list will receive the dynamic dependent data from the form.
+        public List<DependentInputModel> Dependents { get; set; }
+
+        // Your FamilyDetails property should also be here
+        public FamilyDetails FamilyDetails { get; set; }
+
+    }
+
+    // In ~/Models/EmpDepDtls.cs
+    public class EmpDepDtls
+    {
+        public string EmpNo { get; set; }
+        public string FatherName { get; set; }
+        public string MotherName { get; set; }
+        public string WifeName { get; set; }
+        public string HusbandName { get; set; }
+        public string Son1 { get; set; }
+        public string Son2 { get; set; }
+        public string Son3 { get; set; }
+        public string Daughter1 { get; set; }
+        public string Daughter2 { get; set; }
+        public string Daughter3 { get; set; }
+    }
+
+
+    // This class maps directly to your empdepmast table
+    public class EmpDepMast
+    {
+        public int depid { get; set; }
+        public string depdesc { get; set; }
+        public string depcode { get; set; }
+    }
+
+    // This is what the JavaScript expects (No changes here)
+    public class DependentTypeDto
+    {
+        public int Id { get; set; }
+        public string TypeName { get; set; }
+    }
+
+    public class DependentInputModel
+    {
+        public int DependentTypeId { get; set; }
+        public string Name { get; set; }
+    }
+
+    // In a new file: EmpDependentDetail.cs
+
+    public class EmpDependentDetail
+    {
+        public string EmpNo { get; set; }
+        public int DepId { get; set; }
+        public string DepName { get; set; }
+    }
+
+    public class FamilyDetails
+    {
+        // This property will hold the "Self" or "NotSelf" value 
+        // submitted from the form's toggle switch.
+        public string FamilyStatus { get; set; }
+
+        // You can also include the EmpNo if you plan to save this to a table
+        // public string EmpNo { get; set; }
     }
 
 

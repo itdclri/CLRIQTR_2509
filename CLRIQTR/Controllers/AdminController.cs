@@ -1,7 +1,10 @@
 ﻿using CLRIQTR.Data.Repositories.Implementations;
 using CLRIQTR.Data.Repositories.Interfaces;
 using CLRIQTR.Models;
+using CLRIQTR.Repositories;
 using CLRIQTR.Services;
+using MySql.Data.MySqlClient;
+using Rotativa;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,6 +21,7 @@ namespace CLRIQTR.Controllers
         private readonly IQuarterRepository _quarterRepo;
         private readonly ILookupRepository _lookupRepo;
         private readonly IQuarterService _quarterService;
+        private readonly AdminRepository _adminRepository = new AdminRepository();
 
         public AdminController()
         {
@@ -117,6 +121,9 @@ namespace CLRIQTR.Controllers
                                  .Select(d => new { Value = d.DesId, Text = d.DesDesc })
                                  .ToList();
 
+            ViewBag.DependentTypes = new SelectList(_employeeRepo.GetAllDependentTypes(), "Id", "TypeName");
+
+
             ViewBag.Labs = new SelectList(labs, "Value", "Text", selectedLab);
             ViewBag.Designations = new SelectList(designations, "Value", "Text", selectedDesignation);
 
@@ -156,7 +163,8 @@ namespace CLRIQTR.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(EmpMastTest emp)
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(EmpMastTest emp) // Make sure EmpMastTest has `public List<DependentInputModel> Dependents { get; set; }`
         {
             if (ModelState.IsValid)
             {
@@ -166,17 +174,36 @@ namespace CLRIQTR.Controllers
                     emp.DOJ = emp.DOJ_dt?.ToString("dd-MM-yyyy");
                     emp.DOP = emp.DOP_dt?.ToString("dd-MM-yyyy");
                     emp.DOR = emp.DOR_dt?.ToString("dd-MM-yyyy");
-
-                    emp.Gender = emp.Gender?.ToUpper() == "M" ? "M" : emp.Gender?.ToUpper() == "F" ? "F" : null;
                     emp.Active = "Y";
                     emp.Phy = emp.Phy?.ToUpper() == "Y" ? "Y" : "N";
-
                     emp.EnteredDate = DateTime.UtcNow;
                     emp.EnteredIP = Request.UserHostAddress;
 
+                    // 1. Save the main employee record first
                     _employeeRepo.AddEmployee(emp, Request.UserHostAddress);
 
-                    TempData["Message"] = "Employee added successfully!";
+                    // 2. NEW LOGIC: Check if dependents were submitted and loop through them
+                    //    Assumes your EmpMastTest model has a FamilyDetails object with a 'FamilyStatus' property
+                    if (emp.Dependents != null && emp.Dependents.Any())
+                    {
+                        Debug.WriteLine("Family");
+                        foreach (var dependent in emp.Dependents)
+                        {
+                            // Create a new object for each dependent to be saved
+                            // I am assuming your database table model is called `EmpDependentDetail`
+                            var newDependent = new EmpDependentDetail
+                            {
+                                EmpNo = emp.EmpNo, // The newly created employee's number
+                                DepId = dependent.DependentTypeId, // The dependent type ID
+                                DepName = dependent.Name // The dependent's name
+                            };
+
+                            // Call the new repository method to insert this dependent
+                            _employeeRepo.AddDependent(newDependent);
+                        }
+                    }
+
+                    TempData["Message"] = "Employee and dependents added successfully!";
                     return RedirectToAction("Index");
                 }
                 catch (Exception ex)
@@ -189,34 +216,36 @@ namespace CLRIQTR.Controllers
             return View(emp);
         }
 
+        // GET: Employee/Edit/5
         public ActionResult Edit(string id)
         {
-            if (id == null) return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+            }
 
             var emp = _employeeRepo.GetEmployeeByEmpNo(id);
-            if (emp == null) return HttpNotFound();
+            if (emp == null)
+            {
+                return HttpNotFound();
+            }
 
-            if (!string.IsNullOrEmpty(emp.DOB) && DateTime.TryParseExact(emp.DOB, "dd-MM-yyyy",
-                CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dob))
-                emp.DOB_dt = dob;
+            // Load existing dependents for this employee
+            emp.Dependents = _employeeRepo.GetDependentsByEmpNo(id);
 
-            if (!string.IsNullOrEmpty(emp.DOJ) && DateTime.TryParseExact(emp.DOJ, "dd-MM-yyyy",
-                CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime doj))
-                emp.DOJ_dt = doj;
-
-            if (!string.IsNullOrEmpty(emp.DOP) && DateTime.TryParseExact(emp.DOP, "dd-MM-yyyy",
-                CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dop))
-                emp.DOP_dt = dop;
-
-            if (!string.IsNullOrEmpty(emp.DOR) && DateTime.TryParseExact(emp.DOR, "dd-MM-yyyy",
-                CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dor))
-                emp.DOR_dt = dor;
+            // Parse string dates from DB to nullable DateTime for the date pickers
+            if (!string.IsNullOrEmpty(emp.DOB)) DateTime.TryParseExact(emp.DOB, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dob);
+            if (!string.IsNullOrEmpty(emp.DOJ)) DateTime.TryParseExact(emp.DOJ, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime doj);
+            if (!string.IsNullOrEmpty(emp.DOP)) DateTime.TryParseExact(emp.DOP, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dop);
+            if (!string.IsNullOrEmpty(emp.DOR)) DateTime.TryParseExact(emp.DOR, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dor);
 
             LoadDropdowns(emp.LabCode, emp.Designation);
             return View(emp);
         }
 
+        // POST: Employee/Edit/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Edit(EmpMastTest emp)
         {
             if (ModelState.IsValid)
@@ -228,13 +257,13 @@ namespace CLRIQTR.Controllers
                     emp.DOP = emp.DOP_dt?.ToString("dd-MM-yyyy");
                     emp.DOR = emp.DOR_dt?.ToString("dd-MM-yyyy");
 
-                    emp.Gender = emp.Gender?.ToUpper() == "M" ? "M" : emp.Gender?.ToUpper() == "F" ? "F" : null;
-                    emp.Active = emp.Active?.ToUpper() == "Y" ? "Y" : "N";
-                    emp.Phy = emp.Phy?.ToUpper() == "Y" ? "Y" : "N";
-
+                    // 1. Update the main employee record
                     _employeeRepo.UpdateEmployee(emp);
 
-                    TempData["Message"] = "Employee updated successfully!";
+                    // 2. Update the dependents (delete old ones, insert new ones)
+                    _employeeRepo.UpdateDependents(emp.EmpNo, emp.Dependents);
+
+                    TempData["Message"] = "Employee and dependents updated successfully!";
                     return RedirectToAction("Index");
                 }
                 catch (Exception ex)
@@ -243,6 +272,7 @@ namespace CLRIQTR.Controllers
                 }
             }
 
+            // If we got this far, something failed, redisplay form
             LoadDropdowns(emp.LabCode, emp.Designation);
             return View(emp);
         }
@@ -469,5 +499,92 @@ namespace CLRIQTR.Controllers
                 return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
+
+
+        [HttpGet]
+        public JsonResult GetDependentTypes()
+        {
+            var dependentTypes = _employeeRepo.GetAllDependentTypes();
+
+            return Json(dependentTypes, JsonRequestBehavior.AllowGet);
+        }
+
+
+
+        [HttpGet]
+        public ActionResult GenerateTentativeReport()
+        {
+            var tentativeData = _adminRepository.GetAllTentativeData();
+            return new ViewAsPdf("Tentative", tentativeData)
+            {
+                FileName = "Tentative_Report.pdf",
+                PageSize = Rotativa.Options.Size.A4,
+                PageMargins = new Rotativa.Options.Margins(20, 15, 15, 15)
+            };
+        }
+
+        [HttpGet]
+        public ActionResult GenerateFinalReport()
+        {
+            var finalData = _adminRepository.GetAllTentativeData();
+            return new ViewAsPdf("Final", finalData)
+            {
+                FileName = "Final_Report.pdf",
+                PageSize = Rotativa.Options.Size.A4,
+                PageMargins = new Rotativa.Options.Margins(20, 15, 15, 15)
+            };
+        }
+
+        public ActionResult Tentative()
+        {
+            var data = _adminRepository.GetAllTentativeData();
+            return View(data);
+        }
+
+        public ActionResult Final()
+        {
+            var data = _adminRepository.GetAllTentativeData();
+            return View(data);
+        }
+
+        public ActionResult Rule(string EmpNo = null, string EmpName = null)
+        {
+
+            ViewBag.EmpNoFilter = EmpNo;
+            ViewBag.EmpNameFilter = EmpName;
+
+            var employee = new List<AdminLogin>();
+
+            // Only search the database if at least one filter has a value
+            if (!string.IsNullOrWhiteSpace(EmpNo) || !string.IsNullOrWhiteSpace(EmpName))
+            {
+                employee = _adminRepository.GetEmployee(EmpNo, EmpName);
+            }
+
+            return View(employee);
+        }
+
+        [HttpPost]
+        public JsonResult SaveAdminRemark(AdminLogin model)
+        {
+            if (model == null || string.IsNullOrWhiteSpace(model.EmpNo) || string.IsNullOrWhiteSpace(model.Remarks))
+            {
+                return Json(new { success = false, message = "Invalid data received." });
+            }
+
+            try
+            {
+                _adminRepository.InsertOrUpdateAdminRemark(model.EmpNo, model.Remarks);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception ex
+                return Json(new { success = false, message = "An error occurred while saving." });
+            }
+        }
+
+
+
     }
 }

@@ -7,6 +7,29 @@
     int totalPages = ViewBag.TotalPages ?? 1;
 }
 
+<!-- Horizontal Menu Bar -->
+<nav class="navbar navbar-expand navbar-light bg-light mb-4">
+    <div class="container">
+        <ul class="navbar-nav me-auto">
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Index", "Admin")">Home</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("GenerateTentativeReport", "Admin")">Generate Tentative Report</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="@Url.Action("GenerateFinalReport", "Admin")">Generate Final Report</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="@Url.Action("Rule", "Admin")">Rule 10.1</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
 <div class="index-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
     <div class="right-search-section" style="flex-grow: 1; margin-left: 20px;">
         @using (Html.BeginForm("Index", "Admin", FormMethod.Get, new { @class = "filter-form", style = "display: flex; align-items: center; gap = 10px; flex-wrap: wrap;" }))
@@ -35,25 +58,25 @@
     };
 
 
-    <div class="form-group">
-        <label for="Status" style="margin-bottom: 0;">Status</label>
-        @Html.DropDownList("Status", statusList, new { @class = "form-control", style = "min-width: 150px;" })
-    </div>
+<div class="form-group">
+    <label for="Status" style="margin-bottom: 0;">Status</label>
+    @Html.DropDownList("Status", statusList, new { @class = "form-control", style = "min-width: 150px;" })
+</div>
 
-    <label style="font-size: 11px; margin-right: 4px;">Records</label>
-    <select name="pageSize" style="width: 50px; font-size: 11px; padding: 1px 2px; height: 24px;">
-        <option value="10" @(pageSize == 10 ? "selected" : "")>10</option>
-        <option value="20" @(pageSize == 20 ? "selected" : "")>20</option>
-        <option value="30" @(pageSize == 30 ? "selected" : "")>30</option>
-    </select>
-
-
+<label style="font-size: 11px; margin-right: 4px;">Records</label>
+<select name="pageSize" style="width: 50px; font-size: 11px; padding: 1px 2px; height: 24px;">
+    <option value="10" @(pageSize == 10 ? "selected" : "")>10</option>
+    <option value="20" @(pageSize == 20 ? "selected" : "")>20</option>
+    <option value="30" @(pageSize == 30 ? "selected" : "")>30</option>
+</select>
 
 
-    <div class="button-group" style="display: flex; flex-direction: column; gap: 6px;">
-        <input type="submit" value="Search" class="btn btn-secondary btn-sm" />
-        <a href="@Url.Action("Index")" class="btn btn-light btn-sm">Reset</a>
-    </div>
+
+
+<div class="button-group" style="display: flex; flex-direction: column; gap: 6px;">
+    <input type="submit" value="Search" class="btn btn-secondary btn-sm" />
+    <a href="@Url.Action("Index")" class="btn btn-light btn-sm">Reset</a>
+</div>
 }
     </div>
 </div>
@@ -109,9 +132,9 @@
                     <td>@item.DOJ</td>
                     <td>@(item.Active == "Y" ? "Yes" : "No")</td>
                     @*<td>
-                        @(item.QtrStatus == "O" ? "Occupied" :
-      item.QtrStatus == "V" ? "Vacant" : "")
-                    </td>*@
+                                          @(item.QtrStatus == "O" ? "Occupied" :
+                        item.QtrStatus == "V" ? "Vacant" : "")
+                                      </td>*@
 
                     <td>
                         <div class="action-buttons">

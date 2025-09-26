@@ -1,12 +1,13 @@
 ﻿using CLRIQTR.Data.Repositories.Interfaces;
 using CLRIQTR.Models;
 using MySql.Data.MySqlClient;
-using Mysqlx.Crud;
+using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
+using Dapper;
 
 namespace CLRIQTR.Data.Repositories.Implementations
 {
@@ -402,5 +403,179 @@ namespace CLRIQTR.Data.Repositories.Implementations
         {
             // Cleanup if needed
         }
+
+
+        public EmpDepDtls GetFamilyDetailsByEmpNo(string empNo)
+        {
+            EmpDepDtls details = null;
+            const string sql = "SELECT * FROM empdepdtls WHERE empno = @empno";
+
+            using (var conn = new MySqlConnection(_connStr))
+            using (var cmd = new MySqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@empno", empNo);
+                conn.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        details = new EmpDepDtls
+                        {
+                            EmpNo = reader["empno"].ToString(),
+                            FatherName = reader["f1"] != DBNull.Value ? reader["f1"].ToString() : null,
+                            MotherName = reader["m1"] != DBNull.Value ? reader["m1"].ToString() : null,
+                            WifeName = reader["w1"] != DBNull.Value ? reader["w1"].ToString() : null,
+                            HusbandName = reader["h1"] != DBNull.Value ? reader["h1"].ToString() : null,
+                            Son1 = reader["s1"] != DBNull.Value ? reader["s1"].ToString() : null,
+                            Son2 = reader["s2"] != DBNull.Value ? reader["s2"].ToString() : null,
+                            Son3 = reader["s3"] != DBNull.Value ? reader["s3"].ToString() : null,
+                            Daughter1 = reader["d1"] != DBNull.Value ? reader["d1"].ToString() : null,
+                            Daughter2 = reader["d2"] != DBNull.Value ? reader["d2"].ToString() : null,
+                            Daughter3 = reader["d3"] != DBNull.Value ? reader["d3"].ToString() : null,
+                        };
+                    }
+                }
+            }
+            return details;
+        }
+
+        public void UpsertFamilyDetails(EmpDepDtls details)
+        {
+            // This query inserts a new record. If a record with the same primary key (empno)
+            // already exists, it updates the existing record instead.
+            const string sql = @"
+INSERT INTO empdepdtls (empno, f1, m1, w1, h1, s1, s2, s3, d1, d2, d3,depslno,deprel,depage,depname)
+VALUES (@empno, @f1, @m1, @w1, @h1, @s1, @s2, @s3, @d1, @d2, @d3, 1, 'family', 0, '')
+ON DUPLICATE KEY UPDATE
+    f1 = VALUES(f1), m1 = VALUES(m1), w1 = VALUES(w1), h1 = VALUES(h1),
+    s1 = VALUES(s1), s2 = VALUES(s2), s3 = VALUES(s3),
+    d1 = VALUES(d1), d2 = VALUES(d2), d3 = VALUES(d3);";
+
+            using (var conn = new MySqlConnection(_connStr))
+            using (var cmd = new MySqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@empno", details.EmpNo);
+                cmd.Parameters.AddWithValue("@f1", (object)details.FatherName ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@m1", (object)details.MotherName ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@w1", (object)details.WifeName ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@h1", (object)details.HusbandName ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@s1", (object)details.Son1 ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@s2", (object)details.Son2 ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@s3", (object)details.Son3 ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@d1", (object)details.Daughter1 ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@d2", (object)details.Daughter2 ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@d3", (object)details.Daughter3 ?? DBNull.Value);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+
+        public IEnumerable<DependentTypeDto> GetAllDependentTypes()
+        {
+            string sql = "SELECT depid, depdesc FROM empdepmast ORDER BY depdesc;";
+
+            using (var connection = new MySqlConnection(_connStr))
+            {
+                // 1. Query the database
+                var dbData = connection.Query<EmpDepMast>(sql).ToList();
+
+                // 2. Map to the DTO and return the result
+                return dbData.Select(d => new DependentTypeDto
+                {
+                    Id = d.depid,
+                    TypeName = d.depdesc
+                }).ToList();
+            }
+        }
+
+        public void AddDependent(EmpDependentDetail dependent)
+        {
+            // NOTE: Change "empdepdetails" to the actual name of your dependents table.
+            string sql = "INSERT INTO empdep (empno, depid, depname) VALUES (@EmpNo, @DepId, @DepName);";
+            Debug.WriteLine("Family");
+
+            using (var connection = new MySqlConnection(_connStr))
+            {
+                connection.Execute(sql, dependent);
+            }
+        }
+
+        // --- NEW: Implementation for GetDependentsByEmpNo ---
+
+        /// <summary>
+        /// Gets a list of all dependents for a specific employee.
+        /// </summary>
+        public List<DependentInputModel> GetDependentsByEmpNo(string empNo)
+        {
+            // Use aliases (AS) to map table columns (depid, depname) directly to model properties
+            string sql = @"SELECT 
+                               depid AS DependentTypeId, 
+                               depname AS Name 
+                           FROM empdep 
+                           WHERE empno = @EmpNo;";
+
+            using (var connection = new MySqlConnection(_connStr))
+            {
+                // Dapper maps the query result to a list of DependentInputModel
+                return connection.Query<DependentInputModel>(sql, new { EmpNo = empNo }).ToList();
+            }
+        }
+
+        // --- NEW: Implementation for UpdateDependents ---
+
+        /// <summary>
+        /// Updates all dependents for an employee using a delete-then-insert strategy.
+        /// This ensures additions, updates, and removals are all handled.
+        /// </summary>
+        public void UpdateDependents(string empNo, List<DependentInputModel> dependents)
+        {
+            using (var connection = new MySqlConnection(_connStr))
+            {
+                connection.Open();
+                // Use a transaction to ensure both operations succeed or fail together
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // 1. Delete all existing dependents for this employee
+                        string deleteSql = "DELETE FROM empdep WHERE empno = @EmpNo;";
+                        connection.Execute(deleteSql, new { EmpNo = empNo }, transaction);
+
+                        // 2. Insert the new list of dependents
+                        if (dependents != null && dependents.Any())
+                        {
+                            string insertSql = "INSERT INTO empdep (empno, depid, depname) VALUES (@EmpNo, @DependentTypeId, @Name);";
+
+                            foreach (var dependent in dependents)
+                            {
+                                // Ensure we only insert valid data
+                                if (dependent.DependentTypeId > 0 && !string.IsNullOrWhiteSpace(dependent.Name))
+                                {
+                                    connection.Execute(insertSql, new
+                                    {
+                                        EmpNo = empNo, // Use the main employee number
+                                        dependent.DependentTypeId,
+                                        dependent.Name
+                                    }, transaction);
+                                }
+                            }
+                        }
+
+                        // If all commands succeeded, commit the transaction
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        // If any command fails, roll back the entire transaction
+                        transaction.Rollback();
+                        throw; // Re-throw the exception to notify the controller
+                    }
+                }
+            }
+        }
+
+
     }
 }

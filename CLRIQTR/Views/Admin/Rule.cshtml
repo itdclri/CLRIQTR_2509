@@ -1,0 +1,219 @@
+﻿@model IEnumerable<CLRIQTR.Models.AdminLogin>
+
+<!-- Horizontal Menu Bar -->
+<nav class="navbar navbar-expand navbar-light bg-light mb-4">
+    <div class="container">
+        <ul class="navbar-nav me-auto">
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Index", "Admin")">Home</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("GenerateTentativeReport", "Admin")">Generate Tentative Report</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="@Url.Action("GenerateFinalReport", "Admin")">Generate Final Report</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="@Url.Action("Rule", "Admin")">Rule 10.1</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+
+<div class="index-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+    <div class="right-search-section" style="flex-grow: 1; margin-left: 20px;">
+        @using (Html.BeginForm("Rule", "Admin", FormMethod.Get, new { @class = "filter-form", style = "display: flex; align-items: center; gap = 10px; flex-wrap: wrap;" }))
+        {
+            <div class="form-group">
+                <label for="EmpNo" style="margin-bottom: 0;">Employee Number</label>
+                <br />
+                <input type="text" name="EmpNo" class="form-control" placeholder="Search Employee No"
+                       value="@ViewBag.EmpNoFilter"
+                       style="min-width: 120px;" />
+            </div>
+
+            <div class="form-group">
+                <label for="EmpName" style="margin-bottom: 0;">Employee Name</label>
+                <br />
+                <input type="text" name="EmpName" class="form-control" placeholder="Search Employee  Name"
+                       value="@ViewBag.EmpNameFilter"
+                       style="min-width: 150px;" />
+            </div>
+
+            <div class="button-group" style="display: flex; flex-direction: column; gap: 6px;">
+                <input type="submit" value="Search" class="btn btn-secondary btn-sm" />
+                <a href="@Url.Action("Rule")" class="btn btn-light btn-sm">Reset</a>
+            </div>
+
+        }
+    </div>
+</div>
+
+<hr />
+
+<h4>Search Results</h4>
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Employee Number</th>
+                <th>Employee Name</th>
+                <th>Category</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var employee in Model)
+                {
+                    <tr>
+                        <td>@employee.EmpNo</td>
+                        <td>@employee.EmpName</td>
+                        <td>@employee.Category</td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm edit-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#remarksModal"
+                                    data-empno="@employee.EmpNo"
+                                    data-empname="@employee.EmpName"
+                                    data-category="@employee.Category"
+                                    data-remarks="@employee.Remarks">
+                                Edit
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="text-center">No employees found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<div class="modal fade" id="remarksModal" tabindex="-1" aria-labelledby="remarksModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="remarksModalLabel">Add Admin Remarks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Employee No:</strong> <span id="modalEmpNo"></span></p>
+                <p><strong>Employee Name:</strong> <span id="modalEmpName"></span></p>
+                <p><strong>Category:</strong> <span id="modalCategory"></span></p>
+
+                <input type="hidden" id="hiddenEmpNo" />
+
+                <div class="mb-3">
+                    <label for="remarksText" class="form-label">Remarks</label>
+                    <textarea class="form-control" id="remarksText" rows="4" placeholder="Enter remarks..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div id="modalAlertPlaceholder" class="w-100 mb-2"></div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveRemarkBtn">Save Changes</button>
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const remarksModal = document.getElementById('remarksModal');
+        const saveButton = document.getElementById('saveRemarkBtn');
+        const alertPlaceholder = document.getElementById('modalAlertPlaceholder');
+
+        const showAlert = (message, type) => {
+            alertPlaceholder.innerHTML = '';
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = [
+                `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+                `   <div>${message}</div>`,
+                '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+                '</div>'
+            ].join('');
+            alertPlaceholder.append(wrapper);
+        }
+
+        remarksModal.addEventListener('show.bs.modal', function (event) {
+            alertPlaceholder.innerHTML = '';
+
+            const button = event.relatedTarget;
+            const empNo = button.getAttribute('data-empno');
+            const empName = button.getAttribute('data-empname');
+            const category = button.getAttribute('data-category');
+            // 1. Get the remarks from the button's data attribute
+            const remarks = button.getAttribute('data-remarks');
+
+            remarksModal.querySelector('#modalEmpNo').textContent = empNo;
+            remarksModal.querySelector('#modalEmpName').textContent = empName;
+            remarksModal.querySelector('#modalCategory').textContent = category;
+            remarksModal.querySelector('#hiddenEmpNo').value = empNo;
+
+            // 2. Set the textarea's value with the remarks
+            remarksModal.querySelector('#remarksText').value = remarks || ''; // Use empty string if remarks are null
+        });
+
+        saveButton.addEventListener('click', function () {
+            const empNo = document.getElementById('hiddenEmpNo').value;
+            const remarks = document.getElementById('remarksText').value;
+
+            if (!remarks.trim()) {
+                showAlert('Remarks cannot be empty.', 'warning');
+                return;
+            }
+
+            const originalButtonText = saveButton.innerHTML;
+            saveButton.disabled = true;
+            saveButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...`;
+
+            const data = { EmpNo: empNo, Remarks: remarks };
+
+            fetch('@Url.Action("SaveAdminRemark", "Admin")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    showAlert('Remarks saved successfully!', 'success');
+                    document.getElementById('remarksText').value = '';
+                    setTimeout(() => {
+                        const modalInstance = bootstrap.Modal.getInstance(remarksModal);
+                        modalInstance.hide();
+                    }, 1500);
+                } else {
+                    showAlert(`Error saving remarks: ${result.message}`, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('An unexpected network error occurred.', 'danger');
+            })
+            .finally(() => {
+                saveButton.disabled = false;
+                saveButton.innerHTML = originalButtonText;
+            });
+        });
+    });
+</script>

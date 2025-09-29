@@ -165,7 +165,7 @@ namespace CLRIQTR.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(EmpMastTest emp) // Make sure EmpMastTest has `public List<DependentInputModel> Dependents { get; set; }`
+        public ActionResult Create(EmpMastTest emp) 
         {
             if (ModelState.IsValid)
             {
@@ -180,26 +180,21 @@ namespace CLRIQTR.Controllers
                     emp.EnteredDate = DateTime.UtcNow;
                     emp.EnteredIP = Request.UserHostAddress;
 
-                    // 1. Save the main employee record first
                     _employeeRepo.AddEmployee(emp, Request.UserHostAddress);
 
-                    // 2. NEW LOGIC: Check if dependents were submitted and loop through them
-                    //    Assumes your EmpMastTest model has a FamilyDetails object with a 'FamilyStatus' property
                     if (emp.Dependents != null && emp.Dependents.Any())
                     {
                         Debug.WriteLine("Family");
                         foreach (var dependent in emp.Dependents)
                         {
-                            // Create a new object for each dependent to be saved
-                            // I am assuming your database table model is called `EmpDependentDetail`
+                            
                             var newDependent = new EmpDependentDetail
                             {
-                                EmpNo = emp.EmpNo, // The newly created employee's number
-                                DepId = dependent.DependentTypeId, // The dependent type ID
-                                DepName = dependent.Name // The dependent's name
+                                EmpNo = emp.EmpNo, 
+                                DepId = dependent.DependentTypeId, 
+                                DepName = dependent.Name 
                             };
 
-                            // Call the new repository method to insert this dependent
                             _employeeRepo.AddDependent(newDependent);
                         }
                     }
@@ -262,7 +257,7 @@ namespace CLRIQTR.Controllers
                     _employeeRepo.UpdateEmployee(emp);
 
                     // 2. Update the dependents (delete old ones, insert new ones)
-                    _employeeRepo.UpdateDependents(emp.EmpNo, emp.Dependents);
+                    //_employeeRepo.UpdateDependents(emp.EmpNo, emp.Dependents);
 
                   
                     TempData["Message"] = "Employee and dependents updated successfully!";

@@ -158,8 +158,9 @@ namespace CLRIQTR.Controllers
 
         public ActionResult Create()
         {
+            var model = new EmpMastTest();
             LoadDropdowns();
-            return View();
+            return View(model);
         }
 
         [HttpPost]

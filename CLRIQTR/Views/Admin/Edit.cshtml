@@ -278,7 +278,8 @@
             {
                 <tr data-id="@dep.Id" data-empno="@Model.EmpNo">
                     <td data-typeid="@dep.DependentTypeId">
-                        @(((SelectList)ViewBag.DependentTypes).First(x => x.Value == dep.DependentTypeId.ToString()).Text)
+                        @*@(((SelectList)ViewBag.DependentTypes).First(x => x.Value == dep.DependentTypeId.ToString()).Text)*@
+                        @(((SelectList)ViewBag.DependentTypes).FirstOrDefault(x => x.Value == dep.DependentTypeId.ToString())?.Text ?? "Unknown Type")
                     </td>
                     <td>@dep.Name</td>
                     <td>

@@ -59,6 +59,7 @@ namespace CLRIQTR.Repositories
                             DateOfJoining = reader["doj"].ToString(),
                             Remarks = reader["category"].ToString(),
                             QuarterType = "I",
+
                             OwnHouse = reader["ownhouse"].ToString()
                         });
                     }
@@ -73,9 +74,10 @@ namespace CLRIQTR.Repositories
             var query = @"
                 SELECT a.qtrappno, a.empno, 
                        TRIM(SUBSTR(b.empname, INSTR(b.empname, '.') + 1)) as empname,
-                       b.designation, b.doj, b.category, a.labcode, a.toe, a.ownhouse, b.dob  
+                       b.designation, b.doj, b.category, a.labcode, a.toe, a.ownhouse, b.dob  ,r.remarks
                 FROM eqtrapply a 
                 JOIN empmast b ON a.empno = b.empno 
+                left join qtradminremarks r on r.empno=a.empno
                 WHERE a.appstatus = 'C' AND a.toe = 'II' 
                 ORDER BY STR_TO_DATE(b.doj, '%d-%m-%Y'), STR_TO_DATE(b.dob, '%d-%m-%Y')";
 
@@ -92,6 +94,8 @@ namespace CLRIQTR.Repositories
                         var category = reader["category"].ToString();
                         var dob = reader["dob"].ToString();
                         var oh = reader["ownhouse"].ToString();
+                        var remarks = reader["remarks"].ToString();
+
 
                         if (category == "OBC" || category == "General" || category == "Gen" || category == "GEN" || category == "EWS")
                         {
@@ -108,6 +112,8 @@ namespace CLRIQTR.Repositories
                         //{
                         //    dob = "";
                         //}
+
+                        category += " " + remarks;
 
                         if (oh == "O")
                         {
@@ -138,9 +144,10 @@ namespace CLRIQTR.Repositories
             var query = @"
                 SELECT a.qtrappno, a.empno, 
                        TRIM(SUBSTR(b.empname, INSTR(b.empname, '.') + 1)) as empname,
-                       b.designation, b.doj, b.category, a.labcode, a.toe, a.ownhouse  
+                       b.designation, b.doj, b.category, a.labcode, a.toe, a.ownhouse  ,r.remarks
                 FROM eqtrapply a 
                 JOIN empmast b ON a.empno = b.empno 
+                left join qtradminremarks r on r.empno=a.empno
                 WHERE a.appstatus = 'C' AND a.toe = 'II' AND b.category = 'SC'
                 ORDER BY STR_TO_DATE(b.doj, '%d-%m-%Y')";
 
@@ -156,11 +163,9 @@ namespace CLRIQTR.Repositories
                         var empno = reader["empno"].ToString();
                         var category = reader["category"].ToString();
                         var oh = reader["ownhouse"].ToString();
+                        var remarks = reader["remarks"].ToString();
 
-                        //if (empno == "11066")
-                        //{
-                        //    category += "\n(Rule 10.1 applies)";
-                        //}
+                        category += " " + remarks;
 
                         if (oh == "O")
                         {
@@ -190,9 +195,10 @@ namespace CLRIQTR.Repositories
             var query = @"
                 SELECT a.qtrappno, a.empno, 
                        TRIM(SUBSTR(b.empname, INSTR(b.empname, '.') + 1)) as empname,
-                       b.designation, b.doj, b.category, a.labcode, a.toe, b.dob, a.ownhouse  
+                       b.designation, b.doj, b.category, a.labcode, a.toe, b.dob, a.ownhouse  ,r.remarks
                 FROM eqtrapply a 
                 JOIN empmast b ON a.empno = b.empno 
+                left join qtradminremarks r on r.empno=a.empno
                 WHERE a.appstatus = 'C' AND a.toe = 'III' AND a.eqtrtypesel <> 'NA'
                 ORDER BY STR_TO_DATE(b.doj, '%d-%m-%Y'), STR_TO_DATE(b.dob, '%d-%m-%Y')";
 
@@ -209,11 +215,15 @@ namespace CLRIQTR.Repositories
                         var category = reader["category"].ToString();
                         var dob = reader["dob"].ToString();
                         var oh = reader["ownhouse"].ToString();
+                        var remarks = reader["remarks"].ToString();
+
 
                         if (category == "OBC" || category == "General" || category == "Gen" || category == "GEN" || category == "EWS")
                         {
                             category = "";
                         }
+
+                        category += " " + remarks;
 
                         //if (empno == "10569")
                         //{
@@ -263,9 +273,10 @@ namespace CLRIQTR.Repositories
             var query = @"
                 SELECT a.qtrappno, a.empno, 
                        TRIM(SUBSTR(b.empname, INSTR(b.empname, '.') + 1)) as empname,
-                       b.designation, b.doj, b.category, a.labcode, a.toe, a.ownhouse  
+                       b.designation, b.doj, b.category, a.labcode, a.toe, a.ownhouse  ,r.remarks
                 FROM eqtrapply a 
                 JOIN empmast b ON a.empno = b.empno 
+ left join qtradminremarks r on r.empno=a.empno
                 WHERE a.appstatus = 'C' AND a.toe = 'III' AND a.eqtrtypesel <> 'NA' AND b.category = 'SC'
                 ORDER BY STR_TO_DATE(b.doj, '%d-%m-%Y')";
 
@@ -281,7 +292,7 @@ namespace CLRIQTR.Repositories
                         var empno = reader["empno"].ToString();
                         var category = reader["category"].ToString();
                         var oh = reader["ownhouse"].ToString();
-
+                        var remarks = reader["remarks"].ToString();
                         //if (empno == "2060025")
                         //{
                         //    category += "\n(Rule 10.1 applies)";
@@ -291,7 +302,7 @@ namespace CLRIQTR.Repositories
                         //{
                         //    category += "*";
                         //}
-
+                        category += " " + remarks;
                         if (oh == "O")
                         {
                             category += "*";
@@ -320,9 +331,10 @@ namespace CLRIQTR.Repositories
             var query = @"
                 SELECT a.qtrappno, a.empno, 
                        TRIM(SUBSTR(b.empname, INSTR(b.empname, '.') + 1)) as empname,
-                       b.designation, b.doj, b.category, b.labcode, a.toe, a.ownhouse  
+                       b.designation, b.doj, b.category, b.labcode, a.toe, a.ownhouse  ,r.remarks
                 FROM eqtrapply a 
                 JOIN empmast b ON a.empno = b.empno 
+ left join qtradminremarks r on r.empno=a.empno
                 WHERE a.appstatus = 'C' AND b.category = 'ST' AND a.eqtrtypesel <> 'NA' AND a.toe = 'III'
                 ORDER BY STR_TO_DATE(b.doj, '%d-%m-%Y')";
 
@@ -338,12 +350,12 @@ namespace CLRIQTR.Repositories
                         var empno = reader["empno"].ToString();
                         var category = reader["category"].ToString();
                         var oh = reader["ownhouse"].ToString();
-
+                        var remarks = reader["remarks"].ToString();
                         //if (empno == "2060025")
                         //{
                         //    category += "\n(Rule 10.1 applies)";
                         //}
-
+                        category += " " + remarks;
                         if (oh == "O")
                         {
                             category += "*";
@@ -372,9 +384,10 @@ namespace CLRIQTR.Repositories
             var query = @"
                 SELECT a.qtrappno, a.empno, 
                        TRIM(SUBSTR(b.empname, INSTR(b.empname, '.') + 1)) as empname,
-                       b.designation, b.doj, b.category, b.labcode, a.toe, a.lowertypesel, a.ownhouse  
+                       b.designation, b.doj, b.category, b.labcode, a.toe, a.lowertypesel, a.ownhouse  ,r.remarks
                 FROM eqtrapply a 
                 JOIN empmast b ON a.empno = b.empno 
+ left join qtradminremarks r on r.empno=a.empno
                 WHERE a.appstatus = 'C' AND 
                       ((a.toe = 'IV' AND a.lowertypesel = 'IV') OR 
                        (a.toe = 'IV' AND a.lowertypesel = 'NA') OR 
@@ -393,12 +406,12 @@ namespace CLRIQTR.Repositories
                         var empno = reader["empno"].ToString();
                         var category = reader["category"].ToString();
                         var oh = reader["ownhouse"].ToString();
-
+                        var remarks = reader["remarks"].ToString();
                         if (category == "OBC" || category == "General" || category == "Gen" || category == "GEN" || category == "EWS")
                         {
                             category = "";
                         }
-
+                        category += " " + remarks;
                         //if (empno == "10926")
                         //{
                         //    category += "\n(Rule 10.1 applies)";
@@ -432,9 +445,10 @@ namespace CLRIQTR.Repositories
             var query = @"
                 SELECT a.qtrappno, a.empno, 
                        TRIM(SUBSTR(b.empname, INSTR(b.empname, '.') + 1)) as empname,
-                       b.designation, b.doj, b.category, b.labcode, a.toe, a.lowertypesel, a.ownhouse  
+                       b.designation, b.doj, b.category, b.labcode, a.toe, a.lowertypesel, a.ownhouse  ,r.remarks
                 FROM eqtrapply a 
                 JOIN empmast b ON a.empno = b.empno 
+ left join qtradminremarks r on r.empno=a.empno
                 WHERE a.appstatus = 'C' AND 
                       ((a.toe = 'IV' AND a.lowertypesel IN ('I','NA','IV')) OR 
                        (a.toe = 'V' AND a.lowertypesel IN ('I','NA','IV'))) 
@@ -453,12 +467,12 @@ namespace CLRIQTR.Repositories
                         var empno = reader["empno"].ToString();
                         var category = reader["category"].ToString();
                         var oh = reader["ownhouse"].ToString();
-
+                        var remarks = reader["remarks"].ToString();
                         //if (empno == "10887")
                         //{
                         //    category += "\n(Rule 10.1 applies)";
                         //}
-
+                        category += " " + remarks;
                         if (oh == "O")
                         {
                             category += "*";
@@ -487,9 +501,9 @@ namespace CLRIQTR.Repositories
             var query = @"
                 SELECT a.qtrappno, a.empno, 
                        TRIM(SUBSTR(b.empname, INSTR(b.empname, '.') + 1)) as empname,
-                       b.designation, b.doj, b.category, a.labcode, a.toe, a.ownhouse  
+                       b.designation, b.doj, b.category, a.labcode, a.toe, a.ownhouse  ,r.remarks
                 FROM eqtrapply a 
-                JOIN empmast b ON a.empno = b.empno 
+                JOIN empmast b ON a.empno = b.empno  left join qtradminremarks r on r.empno=a.empno
                 WHERE a.appstatus = 'C' AND a.toe = 'IV' AND a.lowertypesel IN ('I','NA','IV') AND b.category = 'ST'
                 ORDER BY STR_TO_DATE(b.doj, '%d-%m-%Y')";
 
@@ -504,12 +518,12 @@ namespace CLRIQTR.Repositories
                     {
                         var category = reader["category"].ToString();
                         var oh = reader["ownhouse"].ToString();
-
+                        var remarks = reader["remarks"].ToString();
                         if (oh == "O")
                         {
                             category += "*";
                         }
-
+                        category += " " + remarks;
                         results.Add(new TentativeReportModel
                         {
                             SNo = sNo++,
@@ -531,9 +545,9 @@ namespace CLRIQTR.Repositories
         {
             var results = new List<TentativeReportModel>();
             var query = @"
-                SELECT a.qtrappno, a.empno, b.empname, b.designation, b.dop, b.category, b.labcode, a.toe, b.paylvl, a.ownhouse  
+                SELECT a.qtrappno, a.empno, b.empname, b.designation, b.dop, b.category, b.labcode, a.toe, b.paylvl, a.ownhouse  ,r.remarks
                 FROM eqtrapply a 
-                JOIN empmast b ON a.empno = b.empno 
+                JOIN empmast b ON a.empno = b.empno  left join qtradminremarks r on r.empno=a.empno
                 WHERE a.appstatus = 'C' AND a.toe = 'V' AND a.lowertypesel IN ('NA','V','I','NI')
                 ORDER BY b.paylvl DESC, STR_TO_DATE(b.dop, '%d-%m-%Y')";
 
@@ -719,11 +733,11 @@ namespace CLRIQTR.Repositories
             var query = @"
                 SELECT 
                     a.empno, TRIM(SUBSTR(b.empname, INSTR(b.empname, '.') + 1)) AS empname, b.doj, b.category, a.ownhouse,
-                    l.labname, d.desdesc
+                    l.labname, d.desdesc ,r.remarks
                 FROM eqtrapply a 
                 JOIN empmast b ON a.empno = b.empno 
                 LEFT JOIN labmast l ON a.labcode = l.labcode
-                LEFT JOIN desmast d ON b.designation = d.desid
+                LEFT JOIN desmast d ON b.designation = d.desid  left join qtradminremarks r on r.empno=a.empno
                 WHERE a.appstatus = 'C' AND a.toe = 'II' 
                 ORDER BY STR_TO_DATE(b.doj, '%d-%m-%Y')";
 
@@ -738,14 +752,14 @@ namespace CLRIQTR.Repositories
                     {
                         var empno = reader["empno"].ToString();
                         var remarks = reader["category"].ToString();
-
+                        var remarks2 = reader["remarks"].ToString();
                         // Java Logic: Clear non-reserved categories
                         var generalCategories = new[] { "OBC", "General", "Gen", "GEN", "EWS" };
                         if (generalCategories.Contains(remarks))
                         {
                             remarks = "";
                         }
-
+                        remarks2 += " " + remarks2; 
                         //// Java Logic: Special rule for empno 11029
                         //if (empno == "11029")
                         //{
@@ -773,11 +787,11 @@ namespace CLRIQTR.Repositories
             var query = @"
                 SELECT 
                     a.empno, TRIM(SUBSTR(b.empname, INSTR(b.empname, '.') + 1)) AS empname, b.doj, b.category, a.ownhouse,
-                    l.labname, d.desdesc
+                    l.labname, d.desdesc ,r.remarks
                 FROM eqtrapply a 
                 JOIN empmast b ON a.empno = b.empno 
                 LEFT JOIN labmast l ON a.labcode = l.labcode
-                LEFT JOIN desmast d ON b.designation = d.desid
+                LEFT JOIN desmast d ON b.designation = d.desid left join qtradminremarks r on r.empno=a.empno
                 WHERE a.appstatus = 'C' AND a.toe = 'II' AND b.category = 'SC'
                 ORDER BY STR_TO_DATE(b.doj, '%d-%m-%Y')";
 
@@ -792,6 +806,8 @@ namespace CLRIQTR.Repositories
                     {
                         var empno = reader["empno"].ToString();
                         var remarks = reader["category"].ToString();
+                        var remarks2 = reader["remarks"].ToString();
+                        remarks2 += " " + remarks2;
 
                         //// Java Logic: Special rule for empno 10707
                         //if (empno == "10707")

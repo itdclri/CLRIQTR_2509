@@ -72,7 +72,7 @@ namespace CLRIQTR.Data.Repositories.Implementations
         {
             var list = new List<EmpMastTest>();
             var sql = @"SELECT * FROM empmast e 
-               INNER JOIN desmast d ON e.designation = d.desid 
+               left JOIN desmast d ON e.designation = d.desid 
                INNER JOIN labmast l ON e.labcode = l.labcode
                LEFT JOIN QTRUPD q ON e.empno=q.empno
                WHERE e.labcode = @labcode";

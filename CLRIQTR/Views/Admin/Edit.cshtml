@@ -31,165 +31,194 @@
 
     @Html.HiddenFor(m => m.EmpNo)
 
-    <div class="form-horizontal">
-        <!-- Emp Name -->
-        <div class="form-group">
-            @Html.Label("Employee Name", new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.TextBoxFor(m => m.EmpName, new { @class = "form-control", @readonly = "readonly" })
-                @Html.ValidationMessageFor(m => m.EmpName)
-            </div>
+<div class="form-horizontal">
+    <!-- Emp Name -->
+    <div class="form-group">
+        @Html.Label("Employee Name", new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.EmpName, new { @class = "form-control", @readonly = "readonly" })
+            @Html.ValidationMessageFor(m => m.EmpName)
         </div>
+    </div>
 
 
-        <!-- Lab Code -->
-        <div class="form-group">
+    <!-- Lab Code -->
+    @*<div class="form-group">
             @Html.Label("Lab", new { @class = "control-label col-md-2" })
             <div class="col-md-4">
                 @Html.DropDownListFor(m => m.LabCode, (SelectList)ViewBag.Labs, "-- Select Lab --", new { @class = "form-control" })
                 @Html.ValidationMessageFor(m => m.LabCode)
             </div>
+        </div>*@
+
+    @{
+        // A dictionary to map lab codes to their display names
+        var labNames = new Dictionary<int, string>
+{
+        { 100, "CLRI" },
+        { 101, "SERC" },
+        { 102, "CMC" }
+    };
+
+        bool isRecordInFixedLab = Model.LabCode != 0 && labNames.ContainsKey(Model.LabCode);
+    }
+
+    <div class="form-group">
+        @Html.Label("Lab", new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @if (isRecordInFixedLab)
+            {
+                <input type="text" value="@labNames[Model.LabCode]" class="form-control" readonly="readonly" />
+
+                @Html.HiddenFor(m => m.LabCode)
+            }
+            else
+            {
+                @Html.DropDownListFor(m => m.LabCode, (SelectList)ViewBag.Labs, "-- Select Lab --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.LabCode)
+            }
         </div>
+    </div>
 
-        <!-- Designation -->
-        <div class="form-group">
-            @Html.Label("Designation", new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.DropDownListFor(m => m.Designation, (SelectList)ViewBag.Designations, "-- Select Designation --", new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.Designation)
-            </div>
+    <!-- Designation -->
+    <div class="form-group">
+        @Html.Label("Designation", new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.DropDownListFor(m => m.Designation, (SelectList)ViewBag.Designations, "-- Select Designation --", new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Designation)
         </div>
+    </div>
 
-        <!-- Gender -->
-        <div class="form-group">
-            @Html.LabelFor(m => m.Gender, new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.DropDownListFor(m => m.Gender, (SelectList)ViewBag.GenderList, "-- Select Gender --", new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.Gender)
-            </div>
+    <!-- Gender -->
+    <div class="form-group">
+        @Html.LabelFor(m => m.Gender, new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.DropDownListFor(m => m.Gender, (SelectList)ViewBag.GenderList, "-- Select Gender --", new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Gender)
         </div>
+    </div>
 
-        <!-- Pay Level -->
-        <div class="form-group">
-            @Html.Label("Pay Level", new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.TextBoxFor(m => m.PayLvl, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.PayLvl)
-            </div>
+    <!-- Pay Level -->
+    <div class="form-group">
+        @Html.Label("Pay Level", new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.PayLvl, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.PayLvl)
         </div>
+    </div>
 
-        <!-- DOB -->
-        <div class="form-group">
-            @Html.Label("Date of Birth", new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.TextBoxFor(m => m.DOB_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.DOB_dt)
-            </div>
+    <!-- DOB -->
+    <div class="form-group">
+        @Html.Label("Date of Birth", new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.DOB_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.DOB_dt)
         </div>
+    </div>
 
-        <!-- DOJ -->
-        <div class="form-group">
-            @Html.Label("Date of Joining", new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.TextBoxFor(m => m.DOJ_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.DOJ_dt)
-            </div>
+    <!-- DOJ -->
+    <div class="form-group">
+        @Html.Label("Date of Joining", new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.DOJ_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.DOJ_dt)
         </div>
+    </div>
 
-        <!-- Basic Pay -->
-        <div class="form-group">
-            @Html.Label("BasicPay", new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.TextBoxFor(m => m.BasicPay, new { @class = "form-control", type = "number", min = "0" })
-                @Html.ValidationMessageFor(m => m.BasicPay)
-            </div>
+    <!-- Basic Pay -->
+    <div class="form-group">
+        @Html.Label("BasicPay", new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.BasicPay, new { @class = "form-control", type = "number", min = "0" })
+            @Html.ValidationMessageFor(m => m.BasicPay)
         </div>
+    </div>
 
-        <!-- Category -->
-        <div class="form-group">
-            @Html.LabelFor(m => m.Category, new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.DropDownListFor(m => m.Category, new SelectList(new[] { "GEN", "SC", "ST", "OBC" }), "-- Select Category --", new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.Category)
-            </div>
+    <!-- Category -->
+    <div class="form-group">
+        @Html.LabelFor(m => m.Category, new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.DropDownListFor(m => m.Category, new SelectList(new[] { "GEN", "SC", "ST", "OBC" }), "-- Select Category --", new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Category)
         </div>
+    </div>
 
-        <!-- DOP -->
-        <div class="form-group">
-            @Html.Label("Date of Present Post", new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.TextBoxFor(m => m.DOP_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.DOP_dt)
-            </div>
+    <!-- DOP -->
+    <div class="form-group">
+        @Html.Label("Date of Present Post", new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.DOP_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.DOP_dt)
         </div>
+    </div>
 
-        <!-- DOR -->
-        <div class="form-group">
-            @Html.Label("Date of Superannuation", new { @class = "control-label col-md-2" })
+    <!-- DOR -->
+    <div class="form-group">
+        @Html.Label("Date of Superannuation", new { @class = "control-label col-md-2" })
 
-            <div class="col-md-4">
-                @Html.TextBoxFor(m => m.DOR_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control", id = "DOR_dt" })
-                @Html.ValidationMessageFor(m => m.DOR_dt)
-                <span id="dor-error" class="text-danger" style="display:none;">Date of Superannuation is Required when Status is Changed.</span>
-            </div>
-
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.DOR_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control", id = "DOR_dt" })
+            @Html.ValidationMessageFor(m => m.DOR_dt)
+            <span id="dor-error" class="text-danger" style="display:none;">Date of Superannuation is Required when Status is Changed.</span>
         </div>
-
-
-        <!-- Email -->
-        <div class="form-group">
-            @Html.LabelFor(m => m.Email, new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @type = "email" })
-                @Html.ValidationMessageFor(m => m.Email)
-            </div>
-        </div>
-
-        <!-- Active Status -->
-        <div class="form-group">
-            @Html.Label("Active Status", new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.DropDownListFor(m => m.Active, (SelectList)ViewBag.ActiveList, "-- Select Status --", new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.Active)
-            </div>
-        </div>
-
-        <!-- Physically Handicapped -->
-        <div class="form-group">
-            @Html.Label("Physically Handicapped", new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.DropDownListFor(m => m.Phy, (SelectList)ViewBag.PhyList, "-- Select --", new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.Phy)
-            </div>
-        </div>
-
-        <!-- Mobile Number -->
-        <div class="form-group">
-            @Html.Label("Mobile Number", new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.TextBoxFor(m => m.MobileNumber, new { @class = "form-control", @type = "tel" })
-                @Html.ValidationMessageFor(m => m.MobileNumber)
-            </div>
-        </div>
-
-        <!-- Entered Date (Readonly) -->
-        @*<div class="form-group">
-                @Html.LabelFor(m => m.EnteredDate, new { @class = "control-label col-md-2" })
-                <div class="col-md-4">
-                    @Html.TextBoxFor(m => m.EnteredDate, "{0:yyyy-MM-dd}", new { @class = "form-control", @readonly = "readonly", @type = "date" })
-                </div>
-            </div>*@
-
-        <!-- Entered IP (Readonly) -->
-        @*<div class="form-group">
-                @Html.LabelFor(m => m.EnteredIP, new { @class = "control-label col-md-2" })
-                <div class="col-md-4">
-                    @Html.TextBoxFor(m => m.EnteredIP, new { @class = "form-control", @readonly = "readonly" })
-                </div>
-            </div>*@
-
 
     </div>
+
+
+    <!-- Email -->
+    <div class="form-group">
+        @Html.LabelFor(m => m.Email, new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @type = "email" })
+            @Html.ValidationMessageFor(m => m.Email)
+        </div>
+    </div>
+
+    <!-- Active Status -->
+    <div class="form-group">
+        @Html.Label("Active Status", new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.DropDownListFor(m => m.Active, (SelectList)ViewBag.ActiveList, "-- Select Status --", new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Active)
+        </div>
+    </div>
+
+    <!-- Physically Handicapped -->
+    <div class="form-group">
+        @Html.Label("Physically Handicapped", new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.DropDownListFor(m => m.Phy, (SelectList)ViewBag.PhyList, "-- Select --", new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Phy)
+        </div>
+    </div>
+
+    <!-- Mobile Number -->
+    <div class="form-group">
+        @Html.Label("Mobile Number", new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.TextBoxFor(m => m.MobileNumber, new { @class = "form-control", @type = "tel" })
+            @Html.ValidationMessageFor(m => m.MobileNumber)
+        </div>
+    </div>
+
+    <!-- Entered Date (Readonly) -->
+    @*<div class="form-group">
+            @Html.LabelFor(m => m.EnteredDate, new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(m => m.EnteredDate, "{0:yyyy-MM-dd}", new { @class = "form-control", @readonly = "readonly", @type = "date" })
+            </div>
+        </div>*@
+
+    <!-- Entered IP (Readonly) -->
+    @*<div class="form-group">
+            @Html.LabelFor(m => m.EnteredIP, new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(m => m.EnteredIP, new { @class = "form-control", @readonly = "readonly" })
+            </div>
+        </div>*@
+
+
+</div>
 
     @*<fieldset class="scheduler-border">
         <br />

@@ -29,10 +29,10 @@
 
         <!-- Quarter Type -->
         <div class="form-group">
-            <label class="control-label">Quarter Type</label>
+            <label class="control-label">Quarters Type</label>
             @Html.DropDownListFor(m => m.qtrtype,
                                (SelectList)ViewBag.QtrTypes,
-                               "Select Quarter Type",
+                               "Select Quarters Type",
                                new { @class = "form-control", id = "QtrTypeDropdown" })
         </div>
 
@@ -49,7 +49,7 @@
 
         <!-- Status -->
         <div class="form-group">
-            <label class="control-label">Quarter Status</label>
+            <label class="control-label">Quarters Status</label>
             @Html.DropDownListFor(m => m.qtrstatus,
                                new List<SelectListItem> {
                     new SelectListItem{ Text="Occupied", Value="O" },
@@ -60,9 +60,9 @@
 
         <!-- Quarter Numbers (Checkbox List) -->
         <div class="form-group">
-            <label class="control-label">Quarter Numbers</label>
+            <label class="control-label">Quarters Number</label>
             <div id="QuarterNumbersContainer" class="checkbox-list" style="max-height: 200px; overflow-y: auto; border: 1px solid #ced4da; padding: 10px; border-radius: 4px;">
-                <div class="text-muted">Select a Quarter Type first</div>
+                <div class="text-muted">Select a Quarters Type first</div>
             </div>
         </div>
 
@@ -247,7 +247,7 @@
     displayError('Error loading quarter numbers. Please try again.');
     });
     } else {
-    container.innerHTML = '<div class="text-muted">Select a quarter type first</div>';
+    container.innerHTML = '<div class="text-muted">Select a quarters type first</div>';
     }
     });
 

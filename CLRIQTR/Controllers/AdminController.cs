@@ -159,6 +159,7 @@ namespace CLRIQTR.Controllers
         public ActionResult Create()
         {
             var model = new EmpMastTest();
+            var labcode = Session["LabCode"];
             LoadDropdowns();
             return View(model);
         }
@@ -215,6 +216,9 @@ namespace CLRIQTR.Controllers
         // GET: Employee/Edit/5
         public ActionResult Edit(string id)
         {
+
+            var labcode = Session["LabCode"];
+
             if (id == null)
             {
                 return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);

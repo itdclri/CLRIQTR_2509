@@ -10,12 +10,13 @@
 <!-- Horizontal Menu Bar -->
 <nav class="navbar navbar-expand navbar-light bg-light mb-4">
     <div class="container">
+        @* Left-aligned nav links. 'me-auto' pushes everything else away. *@
         <ul class="navbar-nav me-auto">
 
             <li class="nav-item">
                 <a class="nav-link" href="@Url.Action("Index", "Admin")">Home</a>
             </li>
-            @*-- Check if LabCode is 100 before showing these links --*@
+
             @if (Session["LabCode"] != null && Session["LabCode"].ToString() == "100")
             {
                 <li class="nav-item">
@@ -28,8 +29,8 @@
                     <a class="nav-link" aria-current="page" href="@Url.Action("Rule", "Admin")">Rule 10.1</a>
                 </li>
             }
-
         </ul>
+
 
         <div class="d-flex align-items-center ms-auto">
 
@@ -60,6 +61,11 @@
 
         </div>
 
+        <ul class="navbar-nav mb-0">
+            <li class="nav-item">
+                @Html.ActionLink("Logout", "Logout", "Admin", null, new { @class = "nav-link text-danger", style = "font-size: 1.1rem;" })
+            </li>
+        </ul>
     </div>
 </nav>
 

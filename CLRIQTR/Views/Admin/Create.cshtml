@@ -28,7 +28,66 @@
 </style>
 
 
+<nav class="navbar navbar-expand navbar-light bg-light mb-4">
+    <div class="container">
+        @* Left-aligned nav links. 'me-auto' pushes everything else away. *@
+        <ul class="navbar-nav me-auto">
 
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Index", "Admin")">Home</a>
+            </li>
+
+            @if (Session["LabCode"] != null && Session["LabCode"].ToString() == "100")
+            {
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("GenerateTentativeReport", "Admin")">Generate Tentative Report</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="@Url.Action("GenerateFinalReport", "Admin")">Generate Final Report</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="@Url.Action("Rule", "Admin")">Rule 10.1</a>
+                </li>
+            }
+        </ul>
+
+
+        <div class="d-flex align-items-center ms-auto">
+
+            @* User info text with a margin on the right (me-3) *@
+            <div class="navbar-text me-3">
+                Employee Number :  <b>@Session["EmpNo"]</b><br />
+                Lab Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:  <b>
+                    @{
+                        if (Session["LabCode"] != null)
+                        {
+                            switch (Session["LabCode"].ToString())
+                            {
+                                case "100":
+                                    @:CLRI
+                                    break;
+                                case "101":
+                                    @:SERC
+                                    break;
+                                case "102":
+                                    @:CMC
+                                    break;
+                            }
+                        }
+                    }
+                </b>
+            </div>
+
+
+        </div>
+
+        <ul class="navbar-nav mb-0">
+            <li class="nav-item">
+                @Html.ActionLink("Logout", "Logout", "Admin", null, new { @class = "nav-link text-danger", style = "font-size: 1.1rem;" })
+            </li>
+        </ul>
+    </div>
+</nav>
 
 <h2>Add Employee</h2>
 

@@ -79,7 +79,6 @@ namespace CLRIQTR.Data.Repositories.Implementations
 
         
 
-            // Build dynamic WHERE clause
             if (!string.IsNullOrEmpty(empNo))
                 sql += " AND e.empno LIKE @empno";
             if (!string.IsNullOrEmpty(empName))
@@ -151,7 +150,7 @@ namespace CLRIQTR.Data.Repositories.Implementations
                     AddEmployeeParameters(cmd, employee, enteredIp);
                     conn.Open();
 
-                    // Debug output
+                    
                     Debug.WriteLine("Executing SQL: " + sql);
                     foreach (MySqlParameter param in cmd.Parameters)
                     {
@@ -336,19 +335,19 @@ namespace CLRIQTR.Data.Repositories.Implementations
 
         private void AddEmployeeParameters(MySqlCommand cmd, EmpMastTest e, string enteredIp)
         {
-            // Basic parameters
+            
             cmd.Parameters.AddWithValue("@empno", e.EmpNo);
             cmd.Parameters.AddWithValue("@empname", (object)e.EmpName ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@labcode", e.LabCode);
 
-            // Gender - ensure M or F
+            
             cmd.Parameters.AddWithValue("@gender",
                 (e.Gender?.ToUpper() == "M" || e.Gender?.ToUpper() == "F") ? e.Gender.ToUpper() : (object)DBNull.Value);
 
             cmd.Parameters.AddWithValue("@paylvl", (object)e.PayLvl ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@designation", (object)e.Designation ?? DBNull.Value);
 
-            // String date columns
+            
             cmd.Parameters.AddWithValue("@dob", (object)e.DOB ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@doj", (object)e.DOJ ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@dop", (object)e.DOP ?? DBNull.Value);
@@ -365,16 +364,15 @@ namespace CLRIQTR.Data.Repositories.Implementations
                 e.DOR_dt.Value.ToString("yyyy-MM-dd") : (object)DBNull.Value);
 
             cmd.Parameters.AddWithValue("@basicpay", (object)e.BasicPay ?? DBNull.Value);
-            //cmd.Parameters.AddWithValue("@category", (object)e.Category ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@email", (object)e.Email ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@empgroup", (object)e.EmpGroup ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@grade", (object)e.Grade ?? DBNull.Value);
 
-            // Active - ensure Y or N
+          
             cmd.Parameters.AddWithValue("@active",
                 (e.Active?.ToUpper() == "Y" || e.Active?.ToUpper() == "N") ? e.Active.ToUpper() : "N");
 
-            // Phy (Handicapped) - ensure Y or N
+            
             cmd.Parameters.AddWithValue("@phy",
                 (e.Phy?.ToUpper() == "Y" || e.Phy?.ToUpper() == "N") ? e.Phy.ToUpper() : "N");
 
@@ -401,7 +399,7 @@ namespace CLRIQTR.Data.Repositories.Implementations
 
         public void Dispose()
         {
-            // Cleanup if needed
+           
         }
 
 
@@ -441,8 +439,7 @@ namespace CLRIQTR.Data.Repositories.Implementations
 
         public void UpsertFamilyDetails(EmpDepDtls details)
         {
-            // This query inserts a new record. If a record with the same primary key (empno)
-            // already exists, it updates the existing record instead.
+            
             const string sql = @"
 INSERT INTO empdepdtls (empno, f1, m1, w1, h1, s1, s2, s3, d1, d2, d3,depslno,deprel,depage,depname)
 VALUES (@empno, @f1, @m1, @w1, @h1, @s1, @s2, @s3, @d1, @d2, @d3, 1, 'family', 0, '')
@@ -478,10 +475,8 @@ ON DUPLICATE KEY UPDATE
 
             using (var connection = new MySqlConnection(_connStr))
             {
-                // 1. Query the database
                 var dbData = connection.Query<EmpDepMast>(sql).ToList();
 
-                // 2. Map to the DTO and return the result
                 return dbData.Select(d => new DependentTypeDto
                 {
                     Id = d.depid,
@@ -492,7 +487,6 @@ ON DUPLICATE KEY UPDATE
 
         public void AddDependent(EmpDependentDetail dependent)
         {
-            // NOTE: Change "empdepdetails" to the actual name of your dependents table.
             string sql = "INSERT INTO empdep (empno, depid, depname) VALUES (@EmpNo, @DepId, @DepName);";
             Debug.WriteLine("Family");
 
@@ -502,60 +496,30 @@ ON DUPLICATE KEY UPDATE
             }
         }
 
-        // --- NEW: Implementation for GetDependentsByEmpNo ---
-
-        /// <summary>
-        /// Gets a list of all dependents for a specific employee.
-        /// </summary>
-        //public List<DependentInputModel> GetDependentsByEmpNo(string empNo)
-        //{
-        //    // Use aliases (AS) to map table columns (depid, depname) directly to model properties
-        //    string sql = @"SELECT 
-        //                       depid AS DependentTypeId, 
-        //                       depname AS Name 
-        //                   FROM empdep 
-        //                   WHERE empno = @EmpNo;";
-
-        //    using (var connection = new MySqlConnection(_connStr))
-        //    {
-        //        // Dapper maps the query result to a list of DependentInputModel
-        //        return connection.Query<DependentInputModel>(sql, new { EmpNo = empNo }).ToList();
-        //    }
-        //}
-
-        // --- NEW: Implementation for UpdateDependents ---
-
-        /// <summary>
-        /// Updates all dependents for an employee using a delete-then-insert strategy.
-        /// This ensures additions, updates, and removals are all handled.
-        /// </summary>
+       
         public void UpdateDependents(string empNo, List<DependentInputModel> dependents)
         {
             using (var connection = new MySqlConnection(_connStr))
             {
                 connection.Open();
-                // Use a transaction to ensure both operations succeed or fail together
                 using (var transaction = connection.BeginTransaction())
                 {
                     try
                     {
-                        // 1. Delete all existing dependents for this employee
                         string deleteSql = "DELETE FROM empdep WHERE empno = @EmpNo;";
                         connection.Execute(deleteSql, new { EmpNo = empNo }, transaction);
 
-                        // 2. Insert the new list of dependents
                         if (dependents != null && dependents.Any())
                         {
                             string insertSql = "INSERT INTO empdep (empno, depid, depname) VALUES (@EmpNo, @DependentTypeId, @Name);";
 
                             foreach (var dependent in dependents)
                             {
-                                // Ensure we only insert valid data
                                 if (dependent.DependentTypeId > 0 && !string.IsNullOrWhiteSpace(dependent.Name))
                                 {
                                     connection.Execute(insertSql, new
                                     {
-                                        EmpNo = empNo, // Use the main employee number
+                                        EmpNo = empNo, 
                                         dependent.DependentTypeId,
                                         dependent.Name
                                     }, transaction);
@@ -563,37 +527,21 @@ ON DUPLICATE KEY UPDATE
                             }
                         }
 
-                        // If all commands succeeded, commit the transaction
                         transaction.Commit();
                     }
                     catch (Exception)
                     {
-                        // If any command fails, roll back the entire transaction
                         transaction.Rollback();
-                        throw; // Re-throw the exception to notify the controller
+                        throw; 
                     }
                 }
             }
         }
 
-        // 1. UPDATE your GetDependentsByEmpNo to select the primary key
-        //public List<DependentInputModel> GetDependentsByEmpNo(string empNo)
-        //{
-        //    // Make sure your empdep table has a primary key column named 'Id'
-        //    string sql = @"SELECT Id, depid AS DependentTypeId, depname AS Name 
-        //           FROM empdep 
-        //           WHERE empno = @EmpNo;";
-        //    using (var connection = new MySqlConnection(_connStr))
-        //    {
-        //        return connection.Query<DependentInputModel>(sql, new { EmpNo = empNo }).ToList();
-        //    }
-        //}
+       
 
         public List<DependentInputModel> GetDependentsByEmpNo(string empNo)
         {
-            // ============================================================================
-            // FIX #2: THE SQL QUERY MUST SELECT THE 'Id' COLUMN.
-            // ============================================================================
             string sql = @"SELECT 
                        Id, 
                        depid AS DependentTypeId, 
@@ -607,7 +555,6 @@ ON DUPLICATE KEY UPDATE
             }
         }
 
-        // 2. ADD the new AddDependent method
         public DependentInputModel AddDependent(DependentInputModel dependent)
         {
             string sql = @"INSERT INTO empdep (empno, depid, depname) 
@@ -621,7 +568,6 @@ ON DUPLICATE KEY UPDATE
             }
         }
 
-        // 3. ADD the new UpdateDependent method
         public void UpdateDependent(DependentInputModel dependent)
         {
             string sql = @"UPDATE empdep SET depid = @DependentTypeId, depname = @Name 
@@ -632,7 +578,6 @@ ON DUPLICATE KEY UPDATE
             }
         }
 
-        // 4. ADD the new DeleteDependent method
         public void DeleteDependent(int id)
         {
             string sql = "DELETE FROM empdep WHERE Id = @Id;";

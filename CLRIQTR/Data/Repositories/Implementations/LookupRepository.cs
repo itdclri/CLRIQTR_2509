@@ -12,7 +12,6 @@ namespace CLRIQTR.Data.Repositories.Implementations
     {
         private readonly string _connStr = ConfigurationManager.ConnectionStrings["MySqlConn"].ConnectionString;
 
-        // RAW SQL IMPLEMENTATION (PRIMARY)
         public List<LabMast> GetLabs()
         {
             var list = new List<LabMast>();
@@ -74,7 +73,6 @@ namespace CLRIQTR.Data.Repositories.Implementations
 
         public void Dispose()
         {
-            // Cleanup if needed
         }
     }
 }

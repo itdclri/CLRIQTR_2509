@@ -12,7 +12,6 @@ namespace CLRIQTR.Data.Repositories.Implementations
     {
         private readonly string _connStr = ConfigurationManager.ConnectionStrings["MySqlConn"].ConnectionString;
 
-        // RAW SQL IMPLEMENTATION (PRIMARY)
         public EmpMastTest ValidateLogin(string empNo, string password, int labCode)
         {
             const string sql = @"
@@ -37,8 +36,7 @@ namespace CLRIQTR.Data.Repositories.Implementations
                             EmpNo = reader["empno"].ToString(),
                             EmpName = reader["empname"] as string,
                             LabCode = Convert.ToInt32(reader["labcode"]),
-                            //Designation = reader["designation"] as string,
-                            //Active = reader["active"] as string,
+                           
                             Password = reader["password"].ToString()
 
 
@@ -89,7 +87,6 @@ namespace CLRIQTR.Data.Repositories.Implementations
 
         public void Dispose()
         {
-            // Cleanup if needed
         }
     }
 }

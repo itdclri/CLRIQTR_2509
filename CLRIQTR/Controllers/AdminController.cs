@@ -31,9 +31,9 @@ namespace CLRIQTR.Controllers
             _quarterService = new QuarterService(_quarterRepo, _employeeRepo);
         }
 
-        // =============================
+       
         // MAIN EMPLOYEE LISTING PAGES
-        // =============================
+        
         public ActionResult Index(string EmpNo = null, string EmpName = null, string Designation = null, int page = 1, int pageSize = 10, string Status = null)
         {
             if (!int.TryParse(Session["LabCode"]?.ToString(), out int adminLabCode))
@@ -108,9 +108,9 @@ namespace CLRIQTR.Controllers
             return View(viewName, pagedEmployees);
         }
 
-        // =============================
+    
         // EMPLOYEE CRUD OPERATIONS
-        // =============================
+        
         private void LoadDropdowns(int? selectedLab = null, string selectedDesignation = null)
         {
             var labs = _lookupRepo.GetLabs()
@@ -213,7 +213,7 @@ namespace CLRIQTR.Controllers
             return View(emp);
         }
 
-        // GET: Employee/Edit/5
+       
         public ActionResult Edit(string id)
         {
 
@@ -230,10 +230,9 @@ namespace CLRIQTR.Controllers
                 return HttpNotFound();
             }
 
-            // Load existing dependents for this employee
+           
             emp.Dependents = _employeeRepo.GetDependentsByEmpNo(id);
 
-            // Parse string dates from DB to nullable DateTime for the date pickers
             if (!string.IsNullOrEmpty(emp.DOB)) DateTime.TryParseExact(emp.DOB, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dob);
             if (!string.IsNullOrEmpty(emp.DOJ)) DateTime.TryParseExact(emp.DOJ, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime doj);
             if (!string.IsNullOrEmpty(emp.DOP)) DateTime.TryParseExact(emp.DOP, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dop);
@@ -243,7 +242,6 @@ namespace CLRIQTR.Controllers
             return View(emp);
         }
 
-        // POST: Employee/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(EmpMastTest emp)
@@ -257,10 +255,8 @@ namespace CLRIQTR.Controllers
                     emp.DOP = emp.DOP_dt?.ToString("dd-MM-yyyy");
                     emp.DOR = emp.DOR_dt?.ToString("dd-MM-yyyy");
 
-                    // 1. Update the main employee record
                     _employeeRepo.UpdateEmployee(emp);
 
-                    // 2. Update the dependents (delete old ones, insert new ones)
                     //_employeeRepo.UpdateDependents(emp.EmpNo, emp.Dependents);
 
                   
@@ -273,7 +269,6 @@ namespace CLRIQTR.Controllers
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             LoadDropdowns(emp.LabCode, emp.Designation);
             return View(emp);
         }
@@ -295,9 +290,9 @@ namespace CLRIQTR.Controllers
             return RedirectToAction("Index");
         }
 
-        // =============================
+      
         // QUARTER MANAGEMENT (NEW IMPLEMENTATION)
-        // =============================
+      
         public ActionResult QuarterDetails(string empNo)
         {
             var model = _quarterService.GetQuarterDetails(empNo);
@@ -358,9 +353,9 @@ namespace CLRIQTR.Controllers
             return View(isUpdate ? "UpdateQuarterDetails" : "InsertQuarterDetails", model);
         }
 
-        // =============================
+        
         // AJAX METHODS
-        // =============================
+       
         public JsonResult GetPartsByQtr(string qtrType, string empNo = null)
         {
             try
@@ -463,9 +458,7 @@ namespace CLRIQTR.Controllers
             return RedirectToAction("Index", "Login");
         }
 
-        // =============================
         // NEW QUARTER SERVICE METHODS
-        // =============================
         public JsonResult GetPartsByQtrDesc(string qtrDesc, string empNo = null)
         {
             try
@@ -556,7 +549,6 @@ namespace CLRIQTR.Controllers
 
             var employee = new List<AdminLogin>();
 
-            // Only search the database if at least one filter has a value
             if (!string.IsNullOrWhiteSpace(EmpNo) || !string.IsNullOrWhiteSpace(EmpName))
             {
                 employee = _adminRepository.GetEmployee(EmpNo, EmpName);
@@ -580,7 +572,6 @@ namespace CLRIQTR.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception ex
                 return Json(new { success = false, message = "An error occurred while saving." });
             }
         }
@@ -588,7 +579,6 @@ namespace CLRIQTR.Controllers
         [HttpPost]
         public JsonResult AddDependent(DependentInputModel dependent)
         {
-            // --- START DEBUGGING ---
             if (dependent == null)
             {
                 System.Diagnostics.Debug.WriteLine("DEBUG: The 'dependent' object received by the controller is NULL.");
@@ -602,7 +592,6 @@ namespace CLRIQTR.Controllers
             }
 
             System.Diagnostics.Debug.WriteLine($"DEBUG: Received Dependent - EmpNo: {dependent.EmpNo}, TypeId: {dependent.DependentTypeId}, Name: {dependent.Name}");
-            // --- END DEBUGGING ---
 
             try
             {
@@ -611,7 +600,6 @@ namespace CLRIQTR.Controllers
             }
             catch (Exception ex)
             {
-                // Log the full exception details
                 System.Diagnostics.Debug.WriteLine($"ERROR in AddDependent: {ex.ToString()}");
                 return Json(new { success = false, message = ex.Message });
             }
@@ -622,7 +610,7 @@ namespace CLRIQTR.Controllers
         {
             try
             {
-                _employeeRepo.UpdateDependent(dependent); // Repository method to update the record
+                _employeeRepo.UpdateDependent(dependent);
                 return Json(new { success = true });
             }
             catch (Exception ex)
@@ -636,7 +624,7 @@ namespace CLRIQTR.Controllers
         {
             try
             {
-                _employeeRepo.DeleteDependent(id); // Repository method to delete by primary key
+                _employeeRepo.DeleteDependent(id); 
                 return Json(new { success = true });
             }
             catch (Exception ex)

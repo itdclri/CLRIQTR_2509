@@ -209,7 +209,6 @@ namespace CLRIQTR.Data.Repositories.Implementations
 
                         };
 
-                        // Debug print SQL and parameters
                         Debug.WriteLine("SQL Query:");
                         Debug.WriteLine(sql);
                         Debug.WriteLine("Parameters:");
@@ -262,7 +261,6 @@ namespace CLRIQTR.Data.Repositories.Implementations
 
                         };
 
-                        // Debug print SQL and parameters
                         Debug.WriteLine("SQL Query:");
                         Debug.WriteLine(sql);
                         Debug.WriteLine("Parameters:");
@@ -536,7 +534,6 @@ ORDER BY qm.qtr_no";
         }
 
 
-        // Add this method to your QuarterRepository class
         public List<dynamic> GetPartsWithOccupancy(string qtrtype, string currentEmpNo)
         {
             const string sql = @"

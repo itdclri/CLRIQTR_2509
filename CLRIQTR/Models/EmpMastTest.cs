@@ -131,14 +131,11 @@ namespace CLRIQTR.Models
         [NotMapped]
         public string Password { get; set; }
 
-        //public EmpDepDtls FamilyDetails { get; set; }
 
         public string FamilyStatus { get; set; }
 
-        // This list will receive the dynamic dependent data from the form.
         public List<DependentInputModel> Dependents { get; set; }
 
-        // Your FamilyDetails property should also be here
         public FamilyDetails FamilyDetails { get; set; }
 
     }
@@ -160,7 +157,6 @@ namespace CLRIQTR.Models
     }
 
 
-    // This class maps directly to your empdepmast table
     public class EmpDepMast
     {
         public int depid { get; set; }
@@ -168,7 +164,6 @@ namespace CLRIQTR.Models
         public string depcode { get; set; }
     }
 
-    // This is what the JavaScript expects (No changes here)
     public class DependentTypeDto
     {
         public int Id { get; set; }
@@ -186,7 +181,6 @@ namespace CLRIQTR.Models
 
     }
 
-    // In a new file: EmpDependentDetail.cs
 
     public class EmpDependentDetail
     {
@@ -197,12 +191,10 @@ namespace CLRIQTR.Models
 
     public class FamilyDetails
     {
-        // This property will hold the "Self" or "NotSelf" value 
-        // submitted from the form's toggle switch.
+        
         public string FamilyStatus { get; set; }
 
-        // You can also include the EmpNo if you plan to save this to a table
-        // public string EmpNo { get; set; }
+       
     }
 
 

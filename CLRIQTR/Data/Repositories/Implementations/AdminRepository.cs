@@ -1271,30 +1271,24 @@ namespace CLRIQTR.Repositories
                 {
                     conn.Open();
 
-                    // Step 1: Check if a record with the empNo already exists
                     var checkSql = "SELECT COUNT(1) FROM qtradminremarks WHERE empno = @empno";
                     long recordExists = 0;
                     using (var checkCmd = new MySqlCommand(checkSql, conn))
                     {
                         checkCmd.Parameters.AddWithValue("@empno", empNo);
-                        // ExecuteScalar is very efficient for getting a single value back
                         recordExists = (long)checkCmd.ExecuteScalar();
                     }
 
-                    // Step 2: Decide whether to INSERT a new record or UPDATE the existing one
                     string finalSql;
                     if (recordExists > 0)
                     {
-                        // If the record exists, prepare an UPDATE statement
                         finalSql = "UPDATE qtradminremarks SET remarks = @remarks WHERE empno = @empno";
                     }
                     else
                     {
-                        // If the record does not exist, prepare an INSERT statement
                         finalSql = "INSERT INTO qtradminremarks (empno, remarks) VALUES (@empno, @remarks)";
                     }
 
-                    // Step 3: Execute the appropriate command
                     using (var cmd = new MySqlCommand(finalSql, conn))
                     {
                         cmd.Parameters.AddWithValue("@empno", empNo);
@@ -1304,10 +1298,8 @@ namespace CLRIQTR.Repositories
                 }
                 catch (MySqlException ex)
                 {
-                    // It's a good practice to handle potential database errors
-                    // You can log this error to a file or a logging service
                     Console.WriteLine($"A database error occurred: {ex.Message}");
-                    throw; // Re-throw the exception so the calling code knows there was an error
+                    throw; 
                 }
             }
         }

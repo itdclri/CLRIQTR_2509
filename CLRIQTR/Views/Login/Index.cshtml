@@ -3,30 +3,36 @@
 }
 
 <div class="login-container">
-    <h2>Admin Login</h2>
+    <h2>
+        <i class="bi bi-house-lock-fill"></i> Quarters Admin Login
+    </h2>
 
     @using (Html.BeginForm("Index", "Login", FormMethod.Post))
     {
         <div class="form-group">
-            <label for="EmpNo">Employee Number</label>
+            <label for="EmpNo"><i class="bi bi-person-badge"></i> Employee Number</label>
             <input type="text" id="EmpNo" name="EmpNo" class="form-control" required />
         </div>
 
         <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password"><i class="bi bi-shield-lock-fill"></i> Password</label>
             <input type="password" id="password" name="password" class="form-control" required />
         </div>
 
         <div class="form-group">
-            <label for="LabCode">Lab</label>
+            <label for="LabCode"><i class="bi bi-building"></i> Lab</label>
             @Html.DropDownList("LabCode", (SelectList)ViewBag.Labs, "-- Select Lab --", new { @class = "form-control" })
         </div>
 
-        <button type="submit" class="btn btn-primary">Login</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-box-arrow-in-right"></i> Login
+        </button>
 
         if (ViewBag.Error != null)
         {
-            <div class="alert alert-danger mt-2">@ViewBag.Error</div>
+            <div class="alert alert-danger mt-2">
+                <i class="bi bi-exclamation-triangle-fill"></i> @ViewBag.Error
+            </div>
         }
     }
 </div>

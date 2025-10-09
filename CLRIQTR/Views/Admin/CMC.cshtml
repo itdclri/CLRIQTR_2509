@@ -10,33 +10,41 @@
 <!-- Horizontal Menu Bar -->
 <nav class="navbar navbar-expand navbar-light bg-light mb-4">
     <div class="container">
+        @* Left-aligned nav links *@
         <ul class="navbar-nav me-auto">
 
             <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("Index", "Admin")">Home</a>
+                <a class="nav-link" href="@Url.Action("Index", "Admin")">
+                    <i class="bi bi-house-door-fill"></i> Home
+                </a>
             </li>
-            @*-- Check if LabCode is 100 before showing these links --*@
+
             @if (Session["LabCode"] != null && Session["LabCode"].ToString() == "100")
             {
                 <li class="nav-item">
-                    <a class="nav-link" href="@Url.Action("GenerateTentativeReport", "Admin")">Generate Tentative Report</a>
+                    <a class="nav-link" href="@Url.Action("GenerateTentativeReport", "Admin")">
+                        <i class="bi bi-file-earmark-text"></i> Generate Tentative Report
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="@Url.Action("GenerateFinalReport", "Admin")">Generate Final Report</a>
+                    <a class="nav-link" aria-current="page" href="@Url.Action("GenerateFinalReport", "Admin")">
+                        <i class="bi bi-file-earmark-check-fill"></i> Generate Final Report
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="@Url.Action("Rule", "Admin")">Rule 10.1</a>
+                    <a class="nav-link" aria-current="page" href="@Url.Action("Rule", "Admin")">
+                        <i class="bi bi-journal-text"></i> Rule 10.1
+                    </a>
                 </li>
             }
-
         </ul>
 
+        @* Right-aligned user info *@
         <div class="d-flex align-items-center ms-auto">
 
-            @* User info text with a margin on the right (me-3) *@
             <div class="navbar-text me-3">
-                Employee Number :  <b>@Session["EmpNo"]</b><br />
-                Lab Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:  <b>
+                <i class="bi bi-person-badge"></i> Employee Number : <b>@Session["EmpNo"]</b><br />
+                <i class="bi bi-building"></i> Lab Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <b>
                     @{
                         if (Session["LabCode"] != null)
                         {
@@ -56,17 +64,16 @@
                     }
                 </b>
             </div>
-
-
         </div>
 
-
+        @* Logout Button *@
         <ul class="navbar-nav mb-0">
             <li class="nav-item">
-                @Html.ActionLink("Logout", "Logout", "Admin", null, new { @class = "nav-link text-danger", style = "font-size: 1.1rem;" })
+                <a class="nav-link text-danger" style="font-size: 1.1rem;" href="@Url.Action("Logout", "Admin")">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
             </li>
         </ul>
-
     </div>
 </nav>
 
@@ -99,7 +106,7 @@ new SelectListItem { Text = "Not Occupied", Value = "Not Occupied" }
 
 
 <div class="form-group">
-    <label for="Status" style="margin-bottom: 0;">Status</label>
+    <label for="Status" style="margin-bottom: 0;">Quarters Status</label>
     @Html.DropDownList("Status", statusList, new { @class = "form-control", style = "min-width: 150px;" })
 </div>
 
@@ -114,8 +121,12 @@ new SelectListItem { Text = "Not Occupied", Value = "Not Occupied" }
 
 
 <div class="button-group" style="display: flex; flex-direction: column; gap: 6px;">
-    <input type="submit" value="Search" class="btn btn-secondary btn-sm" />
-    <a href="@Url.Action("CMC")" class="btn btn-light btn-sm">Reset</a>
+    <button type="submit" class="btn btn-dark btn-sm">
+        <i class="bi bi-search"></i> Search
+    </button>
+    <a href="@Url.Action("Index")" class="btn btn-light btn-sm">
+        <i class="bi bi-arrow-counterclockwise"></i> Reset
+    </a>
 </div>
 }
     </div>
@@ -123,15 +134,15 @@ new SelectListItem { Text = "Not Occupied", Value = "Not Occupied" }
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;">
     <div class="button-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <a href="@Url.Action("Create", "Admin")" class="btn btn-primary">Add Employee</a>
+        <a href="@Url.Action("Create", "Admin")" class="btn btn-primary"><i class="bi bi-person-plus-fill"></i>Add Employee</a>
 
         @if (Convert.ToInt32(Session["LabCode"] ?? 0) == 100)
         {
-            <a href="@Url.Action("Index", "Admin")" class="btn btn-outline-secondary" id="btnCLRI">CLRI</a>
-            <a href="@Url.Action("SERC", "Admin")" class="btn btn-outline-secondary" id="btnSERC">SERC</a>
+            <a href="@Url.Action("Index", "Admin")" class="btn btn-outline-secondary" id="btnCLRI"> <i class="bi bi-building"></i>CLRI</a>
+            <a href="@Url.Action("SERC", "Admin")" class="btn btn-outline-secondary" id="btnSERC"> <i class="bi bi-gear-fill"></i>SERC</a>
             <a href="@Url.Action("CMC", "Admin")" class="btn btn-outline-secondary" id="btnCMC"
                style="color: #007bff; border-color: #007bff; background-color: transparent; transition: background-color 0.3s;">
-                CMC
+                <i class="bi bi-boxes"></i> CMC
             </a>
 
 
@@ -151,7 +162,7 @@ new SelectListItem { Text = "Not Occupied", Value = "Not Occupied" }
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>Emp No</th>
+            <th>Employee No</th>
             <th>Name</th>
             <th>Designation</th>
             <th>DOB</th>
@@ -180,12 +191,14 @@ new SelectListItem { Text = "Not Occupied", Value = "Not Occupied" }
 
                     <td>
                         <div class="action-buttons">
-                            <button type="button" class="btn btn-sm btn-success view-btn" data-empno="@item.EmpNo">View</button>
+                            <button type="button" class="btn btn-sm btn-success view-btn" data-empno="@item.EmpNo">
+                                <i class="bi bi-eye-fill"></i> View
+                            </button>
 
 
 
 
-                            <a href="@Url.Action("UpdateQuarterDetails", "Admin", new { empNo = item.EmpNo })" class="btn btn-sm btn-info">Update Quarter</a>
+                            <a href="@Url.Action("UpdateQuarterDetails", "Admin", new { empNo = item.EmpNo })" class="btn btn-sm btn-primary"><i class="bi bi-key-fill"></i>Update Quarters</a>
 
                         </div>
                     </td>

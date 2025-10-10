@@ -98,18 +98,12 @@
             </div>
 
 
-            var statusList = new List<SelectListItem>
-{
-        new SelectListItem { Text = "-- All --", Value = "" },
-        new SelectListItem { Text = "Occupied", Value = "Occupied" },
-        new SelectListItem { Text = "Not Occupied", Value = "Not Occupied" }
-    };
 
 
-<div class="form-group">
-    <label for="Status" style="margin-bottom: 0;">Quarters Status</label>
-    @Html.DropDownList("Status", statusList, new { @class = "form-control", style = "min-width: 150px;" })
-</div>
+            <div class="form-group">
+                <label for="Status" style="margin-bottom: 0;">Quarters Status</label>
+                @Html.DropDownList("Status", (SelectList)ViewBag.StatusList, "-- All --", new { @class = "form-control", style = "min-width: 150px;" })
+            </div>
 
 <label style="font-size: 11px; margin-right: 4px;">Records</label>
 <select name="pageSize" style="width: 50px; font-size: 11px; padding: 1px 2px; height: 24px;">
@@ -285,7 +279,8 @@
                         EmpNo = ViewBag.EmpNoFilter,
                         EmpName = ViewBag.EmpNameFilter,
                         Designation = ViewBag.DesignationFilter,
-                        page = totalPages,
+                        Status = ViewBag.StatusFilter,
+                       page = totalPages,
                         pageSize = pageSize
                     })">@totalPages</a>
                 </li>
@@ -297,7 +292,8 @@
                     EmpNo = ViewBag.EmpNoFilter,
                     EmpName = ViewBag.EmpNameFilter,
                     Designation = ViewBag.DesignationFilter,
-                    page = currentPage + 1,
+                     Status = ViewBag.StatusFilter,
+                      page = currentPage + 1,
                     pageSize = pageSize
                 })">Next</a>
             </li>

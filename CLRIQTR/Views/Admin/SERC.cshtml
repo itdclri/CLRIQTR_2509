@@ -96,39 +96,34 @@
                 @Html.DropDownList("Designation", (SelectList)ViewBag.DesignationList, "-- All --", new { @class = "form-control", style = "min-width: 150px;" })
             </div>
 
-
-            var statusList = new List<SelectListItem>
-{
-        new SelectListItem { Text = "-- All --", Value = "" },
-new SelectListItem { Text = "Occupied", Value = "Occupied" },
-new SelectListItem { Text = "Not Occupied", Value = "Not Occupied" }
-    };
-
-
-<div class="form-group">
-    <label for="Status" style="margin-bottom: 0;">Quarters Status</label>
-    @Html.DropDownList("Status", statusList, new { @class = "form-control", style = "min-width: 150px;" })
-</div>
-
-<label style="font-size: 11px; margin-right: 4px;">Records</label>
-<select name="pageSize" style="width: 50px; font-size: 11px; padding: 1px 2px; height: 24px;">
-    <option value="10" @(pageSize == 10 ? "selected" : "")>10</option>
-    <option value="20" @(pageSize == 20 ? "selected" : "")>20</option>
-    <option value="30" @(pageSize == 30 ? "selected" : "")>30</option>
-</select>
+            <div class="form-group">
+                <label for="Status" style="margin-bottom: 0;">Quarters Status</label>
+                @Html.DropDownList("Status", (SelectList)ViewBag.StatusList, "-- All --", new { @class = "form-control", style = "min-width: 150px;" })
+            </div>
 
 
 
 
-<div class="button-group" style="display: flex; flex-direction: column; gap: 6px;">
-    <button type="submit" class="btn btn-dark btn-sm">
-        <i class="bi bi-search"></i> Search
-    </button>
-    <a href="@Url.Action("Index")" class="btn btn-light btn-sm">
-        <i class="bi bi-arrow-counterclockwise"></i> Reset
-    </a>
-</div>
-}
+
+            <label style="font-size: 11px; margin-right: 4px;">Records</label>
+            <select name="pageSize" style="width: 50px; font-size: 11px; padding: 1px 2px; height: 24px;">
+                <option value="10" @(pageSize == 10 ? "selected" : "")>10</option>
+                <option value="20" @(pageSize == 20 ? "selected" : "")>20</option>
+                <option value="30" @(pageSize == 30 ? "selected" : "")>30</option>
+            </select>
+
+
+
+
+            <div class="button-group" style="display: flex; flex-direction: column; gap: 6px;">
+                <button type="submit" class="btn btn-dark btn-sm">
+                    <i class="bi bi-search"></i> Search
+                </button>
+                <a href="@Url.Action("Index")" class="btn btn-light btn-sm">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                </a>
+            </div>
+        }
     </div>
 </div>
 
@@ -285,6 +280,8 @@ Status = ViewBag.StatusFilter,
                     EmpNo = ViewBag.EmpNoFilter,
                     EmpName = ViewBag.EmpNameFilter,
                     Designation = ViewBag.DesignationFilter,
+                    Status = ViewBag.StatusFilter,
+
                     page = currentPage + 1,
                     pageSize = pageSize
                 })">Next</a>

@@ -31,39 +31,17 @@ namespace CLRIQTR.Controllers
             _quarterService = new QuarterService(_quarterRepo, _employeeRepo);
         }
 
-       
+
         // MAIN EMPLOYEE LISTING PAGES
-        
+
         public ActionResult Index(string EmpNo = null, string EmpName = null, string Designation = null, int page = 1, int pageSize = 10, string Status = null)
         {
             if (!int.TryParse(Session["LabCode"]?.ToString(), out int adminLabCode))
-                return RedirectToAction("Index", "Login");
-
-            var employees = _employeeRepo.GetEmployeesByLab(adminLabCode, EmpNo, EmpName, Designation, Status);
-            var totalCount = employees.Count;
-            var pagedEmployees = employees.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-
-            var labs = _lookupRepo.GetLabs();
-            foreach (var emp in pagedEmployees)
             {
-                emp.LabName = labs.FirstOrDefault(l => l.LabCode == emp.LabCode)?.LabName;
+                return RedirectToAction("Index", "Login");
             }
 
-            ViewBag.EmpNoFilter = EmpNo;
-            ViewBag.EmpNameFilter = EmpName;
-            ViewBag.DesignationFilter = Designation;
-            ViewBag.CurrentPage = page;
-            ViewBag.PageSize = pageSize;
-            ViewBag.TotalCount = totalCount;
-            ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
-            ViewBag.StatusFilter = Status;
-
-            var designations = _lookupRepo.GetDesignations()
-                                 .Select(d => new { Value = d.DesId, Text = d.DesDesc })
-                                 .ToList();
-            ViewBag.DesignationList = new SelectList(designations, "Value", "Text", Designation);
-
-            return View(pagedEmployees);
+            return GetLabEmployees(adminLabCode, EmpNo, EmpName, Designation, page, pageSize, Status, "Index");
         }
 
         public ActionResult SERC(string EmpNo = null, string EmpName = null, string Designation = null, int page = 1, int pageSize = 10, string Status = null)
@@ -76,41 +54,40 @@ namespace CLRIQTR.Controllers
             return GetLabEmployees(102, EmpNo, EmpName, Designation, page, pageSize, Status, "CMC");
         }
 
-        private ActionResult GetLabEmployees(int labCode, string empNo, string empName, string designation, int page, int pageSize, string status, string viewName)
+        private ActionResult GetLabEmployees(int labCode, string EmpNo, string EmpName, string Designation, int page, int pageSize, string Status, string viewName)
         {
-            if (!int.TryParse(Session["LabCode"]?.ToString(), out int adminLabCode))
-                return RedirectToAction("Index", "Login");
-
-            var employees = _employeeRepo.GetEmployeesByLab(labCode, empNo, empName, designation, status);
+            var employees = _employeeRepo.GetEmployeesByLab(labCode, EmpNo, EmpName, Designation, Status);
             var totalCount = employees.Count;
+
             var pagedEmployees = employees.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
-            var labs = _lookupRepo.GetLabs();
-            foreach (var emp in pagedEmployees)
-            {
-                emp.LabName = labs.FirstOrDefault(l => l.LabCode == emp.LabCode)?.LabName;
-            }
+            var statuses = new List<SelectListItem>
+    {
+        new SelectListItem { Text = "Occupied", Value = "Occupied" },
+        new SelectListItem { Text = "Not Occupied", Value = "Not Occupied" }
+    };
+            ViewBag.StatusList = new SelectList(statuses, "Value", "Text", Status);
 
-            ViewBag.EmpNoFilter = empNo;
-            ViewBag.EmpNameFilter = empName;
-            ViewBag.DesignationFilter = designation;
+            var designations = _lookupRepo.GetDesignations()
+                                         .Select(d => new { Value = d.DesId, Text = d.DesDesc })
+                                         .ToList();
+            ViewBag.DesignationList = new SelectList(designations, "Value", "Text", Designation);
+
+            ViewBag.EmpNoFilter = EmpNo;
+            ViewBag.EmpNameFilter = EmpName;
+            ViewBag.DesignationFilter = Designation;
+            ViewBag.StatusFilter = Status;
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
             ViewBag.TotalCount = totalCount;
             ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
-            ViewBag.StatusFilter = status;
-
-            var designations = _lookupRepo.GetDesignations()
-                                 .Select(d => new { Value = d.DesId, Text = d.DesDesc })
-                                 .ToList();
-            ViewBag.DesignationList = new SelectList(designations, "Value", "Text", designation);
 
             return View(viewName, pagedEmployees);
         }
 
-    
+
         // EMPLOYEE CRUD OPERATIONS
-        
+
         private void LoadDropdowns(int? selectedLab = null, string selectedDesignation = null)
         {
             var labs = _lookupRepo.GetLabs()

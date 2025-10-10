@@ -138,7 +138,7 @@ new SelectListItem { Text = "Not Occupied", Value = "Not Occupied" }
 
         @if (Convert.ToInt32(Session["LabCode"] ?? 0) == 100)
         {
-            <a href="@Url.Action("Index", "Admin")" class="btn btn-outline-secondary" id="btnCLRI"> <i class="bi bi-building"></i>CLRI</a>
+            <a href="@Url.Action("Index", "Admin")" class="btn btn-outline-secondary" id="btnCLRI"> <i class="bi bi-bag"></i>CLRI</a>
 
 
             <a href="@Url.Action("SERC", "Admin")" class="btn btn-outline-secondary" id="btnSERC"

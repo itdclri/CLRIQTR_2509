@@ -106,20 +106,30 @@
 
 
 <div class="form-horizontal">
-    <!-- Emp No -->
     <div class="form-group">
         @Html.Label("Employee Number", new { @class = "control-label col-md-2" })
         <div class="col-md-4">
-            @Html.TextBoxFor(m => m.EmpNo, new { @class = "form-control" })
+            @Html.TextBoxFor(m => m.EmpNo, new
+            {
+                @class = "form-control",
+                pattern = "[0-9]+", /* This attribute enforces the pattern */
+                title = "Please enter numbers only.", /* Shows this message on validation error */
+                required = "required" /* Makes the field mandatory */
+            })
             @Html.ValidationMessageFor(m => m.EmpNo, "", new { @class = "text-danger" })
         </div>
     </div>
 
-    <!-- Emp Name -->
     <div class="form-group">
         @Html.Label("Employee Name", new { @class = "control-label col-md-2" })
         <div class="col-md-4">
-            @Html.TextBoxFor(m => m.EmpName, new { @class = "form-control" })
+            @Html.TextBoxFor(m => m.EmpName, new
+            {
+                @class = "form-control",
+                pattern = @"[a-zA-Z\s]+", /* This attribute enforces the pattern */
+                title = "Please enter letters and spaces only.", /* Shows this message on error */
+                required = "required" /* Makes the field mandatory */
+            })
             @Html.ValidationMessageFor(m => m.EmpName, "", new { @class = "text-danger" })
         </div>
     </div>

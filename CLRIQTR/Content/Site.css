@@ -1091,3 +1091,8 @@ form[action*="DeactivateConfirmed"] {
         transform: rotate(360deg);
     }
 }
+
+.navbar-nav .nav-link.active {
+    font-weight: bold;
+    color: #0d6efd;  Bootstrap primary color 
+}

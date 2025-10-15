@@ -161,6 +161,7 @@
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
+            <th>Sl. No.</th>
             <th>Employee No</th>
             <th>Name</th>
             <th>Designation</th>
@@ -174,9 +175,11 @@
     <tbody>
         @if (Model != null && Model.Any())
         {
+            int slNo = 1; // 2. Initialized a counter variable
             foreach (var item in Model)
             {
                 <tr>
+                    <td>@(slNo++)</td>
                     <td>@item.EmpNo</td>
                     <td>@item.EmpName</td>
                     <td>@item.DesDesc</td>
@@ -184,36 +187,31 @@
                     <td>@item.DOJ</td>
                     <td>@(item.Active == "Y" ? "Yes" : "No")</td>
                     @*<td>
-                                          @(item.QtrStatus == "O" ? "Occupied" :
-                        item.QtrStatus == "V" ? "Vacant" : "")
-                                      </td>*@
-
-                <td>
-                    <div class="action-buttons">
-
-                        <button type="button" class="btn btn-sm btn-success view-btn" data-empno="@item.EmpNo">
-                            <i class="bi bi-eye-fill"></i> View
-                        </button>
-
-                        <a href="@Url.Action("Edit", "Admin", new { id = item.EmpNo })" class="btn btn-sm btn-info">
-                            <i class="bi bi-pencil-square"></i> Edit
-                        </a>
-
-                        @if (item.LabCode == 100)
-                        {
-                            <a href="@Url.Action("UpdateQuarterDetails", "Admin", new { empNo = item.EmpNo })" class="btn btn-sm btn-primary">
-                                <i class="bi bi-key-fill"></i> Update Quarters
+                            @(item.QtrStatus == "O" ? "Occupied" :
+                            item.QtrStatus == "V" ? "Vacant" : "")
+                        </td>*@
+                    <td>
+                        <div class="action-buttons">
+                            <button type="button" class="btn btn-sm btn-success view-btn" data-empno="@item.EmpNo">
+                                <i class="bi bi-eye-fill"></i> View
+                            </button>
+                            <a href="@Url.Action("Edit", "Admin", new { id = item.EmpNo })" class="btn btn-sm btn-info">
+                                <i class="bi bi-pencil-square"></i> Edit
                             </a>
-                        }
-                    </div>
-                </td>
-
+                            @if (item.LabCode == 100)
+                            {
+                                <a href="@Url.Action("UpdateQuarterDetails", "Admin", new { empNo = item.EmpNo })" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-key-fill"></i> Update Quarters
+                                </a>
+                            }
+                        </div>
+                    </td>
                 </tr>
             }
         }
         else
         {
-            <tr><td colspan="7" class="text-center">No employees found</td></tr>
+            <tr><td colspan="8" class="text-center">No employees found</td></tr>
         }
     </tbody>
 </table>

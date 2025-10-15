@@ -105,261 +105,154 @@
 
     @Html.HiddenFor(m => m.EmpNo)
 
-<div class="form-horizontal">
-    <!-- Emp Name -->
-    <div class="form-group">
-        @Html.Label("Employee Name", new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @Html.TextBoxFor(m => m.EmpName, new { @class = "form-control", @readonly = "readonly" })
-            @Html.ValidationMessageFor(m => m.EmpName)
+    <div class="form-horizontal">
+        <div class="form-group">
+            @Html.Label("Employee Name", new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(m => m.EmpName, new { @class = "form-control", @readonly = "readonly" })
+                @Html.ValidationMessageFor(m => m.EmpName)
+            </div>
         </div>
-    </div>
 
+        @{
+            // A dictionary to map lab codes to their display names
+            var labNames = new Dictionary<int, string>
+        {
+                { 100, "CLRI" },
+                { 101, "SERC" },
+                { 102, "CMC" }
+            };
 
-    <!-- Lab Code -->
-    @*<div class="form-group">
+            bool isRecordInFixedLab = Model.LabCode != 0 && labNames.ContainsKey(Model.LabCode);
+        }
+
+        <div class="form-group">
             @Html.Label("Lab", new { @class = "control-label col-md-2" })
             <div class="col-md-4">
-                @Html.DropDownListFor(m => m.LabCode, (SelectList)ViewBag.Labs, "-- Select Lab --", new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.LabCode)
-            </div>
-        </div>*@
-
-    @{
-        // A dictionary to map lab codes to their display names
-        var labNames = new Dictionary<int, string>
-{
-        { 100, "CLRI" },
-        { 101, "SERC" },
-        { 102, "CMC" }
-    };
-
-        bool isRecordInFixedLab = Model.LabCode != 0 && labNames.ContainsKey(Model.LabCode);
-    }
-
-    <div class="form-group">
-        @Html.Label("Lab", new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @if (isRecordInFixedLab)
-            {
-                <input type="text" value="@labNames[Model.LabCode]" class="form-control" readonly="readonly" />
-
-                @Html.HiddenFor(m => m.LabCode)
-            }
-            else
-            {
-                @Html.DropDownListFor(m => m.LabCode, (SelectList)ViewBag.Labs, "-- Select Lab --", new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.LabCode)
-            }
-        </div>
-    </div>
-
-    <!-- Designation -->
-    <div class="form-group">
-        @Html.Label("Designation", new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @Html.DropDownListFor(m => m.Designation, (SelectList)ViewBag.Designations, "-- Select Designation --", new { @class = "form-control" })
-            @Html.ValidationMessageFor(m => m.Designation)
-        </div>
-    </div>
-
-    <!-- Gender -->
-    <div class="form-group">
-        @Html.LabelFor(m => m.Gender, new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @Html.DropDownListFor(m => m.Gender, (SelectList)ViewBag.GenderList, "-- Select Gender --", new { @class = "form-control" })
-            @Html.ValidationMessageFor(m => m.Gender)
-        </div>
-    </div>
-
-    <!-- Pay Level -->
-    <div class="form-group">
-        @Html.Label("Pay Level", new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @Html.TextBoxFor(m => m.PayLvl, new { @class = "form-control" })
-            @Html.ValidationMessageFor(m => m.PayLvl)
-        </div>
-    </div>
-
-    <!-- DOB -->
-    <div class="form-group">
-        @Html.Label("Date of Birth", new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @Html.TextBoxFor(m => m.DOB_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control" })
-            @Html.ValidationMessageFor(m => m.DOB_dt)
-        </div>
-    </div>
-
-    <!-- DOJ -->
-    <div class="form-group">
-        @Html.Label("Date of Joining", new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @Html.TextBoxFor(m => m.DOJ_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control" })
-            @Html.ValidationMessageFor(m => m.DOJ_dt)
-        </div>
-    </div>
-
-    <!-- Basic Pay -->
-    <div class="form-group">
-        @Html.Label("BasicPay", new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @Html.TextBoxFor(m => m.BasicPay, new { @class = "form-control", type = "number", min = "0" })
-            @Html.ValidationMessageFor(m => m.BasicPay)
-        </div>
-    </div>
-
-    <!-- Category -->
-    <div class="form-group">
-        @Html.LabelFor(m => m.Category, new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @Html.DropDownListFor(m => m.Category, new SelectList(new[] { "GEN", "SC", "ST", "OBC" }), "-- Select Category --", new { @class = "form-control" })
-            @Html.ValidationMessageFor(m => m.Category)
-        </div>
-    </div>
-
-    <!-- DOP -->
-    <div class="form-group">
-        @Html.Label("Date of Present Post", new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @Html.TextBoxFor(m => m.DOP_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control" })
-            @Html.ValidationMessageFor(m => m.DOP_dt)
-        </div>
-    </div>
-
-    <!-- DOR -->
-    <div class="form-group">
-        @Html.Label("Date of Superannuation", new { @class = "control-label col-md-2" })
-
-        <div class="col-md-4">
-            @Html.TextBoxFor(m => m.DOR_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control", id = "DOR_dt" })
-            @Html.ValidationMessageFor(m => m.DOR_dt)
-            <span id="dor-error" class="text-danger" style="display:none;">Date of Superannuation is Required when Status is Changed.</span>
-        </div>
-
-    </div>
-
-
-    <!-- Email -->
-    <div class="form-group">
-        @Html.LabelFor(m => m.Email, new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @type = "email" })
-            @Html.ValidationMessageFor(m => m.Email)
-        </div>
-    </div>
-
-    <!-- Active Status -->
-    <div class="form-group">
-        @Html.Label("Active Status", new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @Html.DropDownListFor(m => m.Active, (SelectList)ViewBag.ActiveList, "-- Select Status --", new { @class = "form-control" })
-            @Html.ValidationMessageFor(m => m.Active)
-        </div>
-    </div>
-
-    <!-- Physically Handicapped -->
-    <div class="form-group">
-        @Html.Label("Physically Handicapped", new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @Html.DropDownListFor(m => m.Phy, (SelectList)ViewBag.PhyList, "-- Select --", new { @class = "form-control" })
-            @Html.ValidationMessageFor(m => m.Phy)
-        </div>
-    </div>
-
-    <!-- Mobile Number -->
-    <div class="form-group">
-        @Html.Label("Mobile Number", new { @class = "control-label col-md-2" })
-        <div class="col-md-4">
-            @Html.TextBoxFor(m => m.MobileNumber, new { @class = "form-control", @type = "tel" })
-            @Html.ValidationMessageFor(m => m.MobileNumber)
-        </div>
-    </div>
-
-    <!-- Entered Date (Readonly) -->
-    @*<div class="form-group">
-            @Html.LabelFor(m => m.EnteredDate, new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.TextBoxFor(m => m.EnteredDate, "{0:yyyy-MM-dd}", new { @class = "form-control", @readonly = "readonly", @type = "date" })
-            </div>
-        </div>*@
-
-    <!-- Entered IP (Readonly) -->
-    @*<div class="form-group">
-            @Html.LabelFor(m => m.EnteredIP, new { @class = "control-label col-md-2" })
-            <div class="col-md-4">
-                @Html.TextBoxFor(m => m.EnteredIP, new { @class = "form-control", @readonly = "readonly" })
-            </div>
-        </div>*@
-
-
-</div>
-
-    @*<fieldset class="scheduler-border">
-        <br />
-        <legend class="scheduler-border">Family Details</legend>
-        <br />
-
-        <div id="dependentsContainer">
-            @if (Model.Dependents != null)
-            {
-                for (int i = 0; i < Model.Dependents.Count; i++)
+                @if (isRecordInFixedLab)
                 {
-                    <div class="row dependent-row" style="margin-bottom: 10px; display: flex; align-items: center;">
-                        <div class="col-md-5">
-                            @Html.DropDownListFor(m => m.Dependents[i].DependentTypeId, (SelectList)ViewBag.DependentTypes, "-- Select Type --", new { @class = "form-control dependent-type-dropdown" })
-                        </div>
-                        <div class="col-md-5">
-                            @Html.TextBoxFor(m => m.Dependents[i].Name, new { @class = "form-control", placeholder = "Enter Dependent's Name" })
-                        </div>
-                        <div class="col-md-2">
-                            <button type="button" class="btn btn-sm btn-danger remove-dependent-btn">
-                                <i class="fa fa-trash"></i> Remove
-                            </button>
-                        </div>
-                    </div>
+                    <input type="text" value="@labNames[Model.LabCode]" class="form-control" readonly="readonly" />
+                    @Html.HiddenFor(m => m.LabCode)
                 }
-            }
-        </div>
-
-        <div class="row" style="margin-top:15px;">
-            <div class="col-md-12">
-                <button type="button" id="addDependentBtn" class="btn btn-sm btn-success">
-                    <i class="fa fa-plus"></i> Add Dependent
-                </button>
+                else
+                {
+                    @Html.DropDownListFor(m => m.LabCode, (SelectList)ViewBag.Labs, "-- Select Lab --", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.LabCode)
+                }
             </div>
         </div>
-    </fieldset>
 
-    <div id="dependentTemplate" style="display: none;">
-        <div class="row dependent-row" style="margin-bottom: 10px; display: flex; align-items: center;">
-            <div class="col-md-5">
-                <select class="form-control dependent-type-dropdown">
-                    <option value="">-- Select Type --</option>
-                </select>
-            </div>
-            <div class="col-md-5">
-                <input type="text" class="form-control" placeholder="Enter Dependent's Name" />
-            </div>
-            <div class="col-md-2">
-                <button type="button" class="btn btn-sm btn-danger remove-dependent-btn">
-                    <i class="fa fa-trash"></i> Remove
-                </button>
+        <div class="form-group">
+            @Html.Label("Designation", new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.Designation, (SelectList)ViewBag.Designations, "-- Select Designation --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Designation)
             </div>
         </div>
-    </div>*@
 
+        <div class="form-group">
+            @Html.LabelFor(m => m.Gender, new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.Gender, (SelectList)ViewBag.GenderList, "-- Select Gender --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Gender)
+            </div>
+        </div>
 
+        <div class="form-group">
+            @Html.Label("Pay Level", new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(m => m.PayLvl, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.PayLvl)
+            </div>
+        </div>
 
-    <!-- Submit Button -->
+        <div class="form-group">
+            @Html.Label("Date of Birth", new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(m => m.DOB_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.DOB_dt)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Date of Joining", new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(m => m.DOJ_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.DOJ_dt)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("BasicPay", new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(m => m.BasicPay, new { @class = "form-control", type = "number", min = "0" })
+                @Html.ValidationMessageFor(m => m.BasicPay)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Category, new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.Category, new SelectList(new[] { "GEN", "SC", "ST", "OBC" }), "-- Select Category --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Category)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Date of Present Post", new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(m => m.DOP_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.DOP_dt)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Date of Superannuation", new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(m => m.DOR_dt, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control", id = "DOR_dt" })
+                @Html.ValidationMessageFor(m => m.DOR_dt)
+                <span id="dor-error" class="text-danger" style="display:none;">Date of Superannuation is Required when Status is Changed.</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Email, new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @type = "email" })
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Active Status", new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.Active, (SelectList)ViewBag.ActiveList, "-- Select Status --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Active)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Physically Handicapped", new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.DropDownListFor(m => m.Phy, (SelectList)ViewBag.PhyList, "-- Select --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Phy)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Mobile Number", new { @class = "control-label col-md-2" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(m => m.MobileNumber, new { @class = "form-control", @type = "tel" })
+                @Html.ValidationMessageFor(m => m.MobileNumber)
+            </div>
+        </div>
+    </div>
+
     <div class="form-group create-center-button">
         <input type="submit" value="Update" class="btn btn-primary" />
         @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-default" })
     </div>
-
-
 }
-
-
 
 <hr />
 
@@ -377,20 +270,23 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var dep in Model.Dependents)
-            {
-                <tr data-id="@dep.Id" data-empno="@Model.EmpNo">
-                    <td data-typeid="@dep.DependentTypeId">
-                        @*@(((SelectList)ViewBag.DependentTypes).First(x => x.Value == dep.DependentTypeId.ToString()).Text)*@
-                        @(((SelectList)ViewBag.DependentTypes).FirstOrDefault(x => x.Value == dep.DependentTypeId.ToString())?.Text ?? "Unknown Type")
-                    </td>
-                    <td>@dep.Name</td>
-                    <td>
-                        <button class="btn btn-sm btn-info edit-btn">Edit</button>
-                        <button class="btn btn-sm btn-danger delete-btn">Delete</button>
-                    </td>
-                </tr>
-            }
+            @if (Model.Dependents != null)
+            {  
+                foreach (var dep in Model.Dependents)
+                {
+                    <tr data-id="@dep.Id" data-empno="@Model.EmpNo">
+                        <td data-typeid="@dep.DependentTypeId">
+                            @(((SelectList)ViewBag.DependentTypes).FirstOrDefault(x => x.Value == dep.DependentTypeId.ToString())?.Text ?? "Unknown Type")
+                        </td>
+                        <td>@dep.Name</td>
+                        <td>
+                            <button class="btn btn-sm btn-info edit-btn">Edit</button>
+                            <button class="btn btn-sm btn-danger delete-btn">Delete</button>
+                        </td>
+                    </tr>
+                }
+            } 
+           
         </tbody>
     </table>
 
@@ -439,15 +335,22 @@
         // --- Event Handler for Cancel Button ---
         tableBody.on('click', '.cancel-btn', function () {
             const row = $(this).closest('tr');
+
+            // BUG FIX: If the row is a new one (no ID), just remove it.
+            if (row.data('id') === undefined) {
+                row.remove();
+                return;
+            }
+
             const typeCell = row.find('td:eq(0)');
             const nameCell = row.find('td:eq(1)');
 
             const originalTypeId = typeCell.data('typeid');
-            // Find the text for the original type ID
-            const originalTypeName = dependentTypes.find(t => t.Value == originalTypeId)?.Text || '';
+            const originalTypeName = dependentTypes.find(t => t.Value == originalTypeId)?.Text || 'Unknown Type';
+            const originalName = nameCell.find('input').prop('defaultValue'); // Revert to original value
 
             typeCell.html(originalTypeName);
-            nameCell.html(row.find('input').val()); // Keep the latest value for now, or revert if needed
+            nameCell.html(originalName);
 
             $(this).removeClass('cancel-btn btn-warning').addClass('delete-btn btn-danger').text('Delete');
             row.find('.save-btn').removeClass('save-btn btn-success').addClass('edit-btn btn-info').text('Edit');
@@ -476,9 +379,6 @@
                 Name: name
             };
 
-            console.log("Sending this data to controller:", data);
-
-
             $.post(url, data, function(response) {
                 if (response.success) {
                     row.find('td:eq(0)').html(typeText).data('typeid', typeId);
@@ -490,8 +390,10 @@
                         row.data('id', response.dependent.Id); // Set the new ID for future edits
                     }
                 } else {
-                    alert('Error saving dependent: ' + response.message);
+                    alert('Error saving dependent: ' + (response.message || 'Unknown error'));
                 }
+            }).fail(function() { // IMPROVEMENT: Add ajax error handling
+                 alert('A server error occurred while saving. Please try again.');
             });
         });
 
@@ -508,8 +410,10 @@
                 if (response.success) {
                     row.fadeOut(300, function() { $(this).remove(); });
                 } else {
-                    alert('Error deleting dependent: ' + response.message);
+                    alert('Error deleting dependent: ' + (response.message || 'Unknown error'));
                 }
+            }).fail(function() { // IMPROVEMENT: Add ajax error handling
+                 alert('A server error occurred while deleting. Please try again.');
             });
         });
 
@@ -527,6 +431,51 @@
                 </tr>`;
             tableBody.append(newRow);
         });
+
+
+        const activeDropdown = $('#Active');
+        const dorInput = $('#DOR_dt');
+        const dorError = $('#dor-error');
+
+        // 1. A function to handle the validation logic
+        function validateDor() {
+            // Get the TEXT of the selected option (e.g., "Active", "Retired")
+            const selectedStatus = activeDropdown.find('option:selected').text();
+
+            // If the status is NOT "Active" and the DOR date is empty...
+            if (selectedStatus !== 'Active' && dorInput.val() === '') {
+                dorError.show(); // ...show the error message.
+                return false;    // ...and indicate that validation failed.
+            }
+            // Otherwise...
+            else {
+                dorError.hide(); // ...hide the error message.
+                return true;     // ...and indicate that validation passed.
+            }
+        }
+
+        // 2. Run the validation when the 'Active' dropdown changes
+        activeDropdown.on('change', function () {
+            validateDor();
+        });
+
+        // Also run it when the user picks a date, to hide the error immediately
+        dorInput.on('change', function () {
+            validateDor();
+        });
+
+        // 3. Prevent the form from submitting if the validation fails
+        $('form').submit(function (e) {
+            if (!validateDor()) {
+                // If the validation function returns false...
+                alert('Please provide the Date of Superannuation as the employee status is not Active.');
+                e.preventDefault(); // ...stop the form submission.
+            }
+        });
+
+        // 4. Run the check once when the page first loads
+        validateDor();
+
     });
     </script>
 }

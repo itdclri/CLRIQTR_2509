@@ -193,11 +193,12 @@ namespace CLRIQTR.Controllers
        
         public ActionResult Edit(string id)
         {
-
+            Debug.WriteLine("Edit",id);
             var labcode = Session["LabCode"];
 
             if (id == null)
             {
+
                 return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
             }
 
@@ -549,6 +550,7 @@ namespace CLRIQTR.Controllers
             }
             catch (Exception ex)
             {
+                Debug.WriteLine(ex);
                 return Json(new { success = false, message = "An error occurred while saving." });
             }
         }

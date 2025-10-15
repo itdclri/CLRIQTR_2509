@@ -18,8 +18,8 @@ namespace CLRIQTR.Data.Repositories.Implementations
         public EmpMastTest GetEmployeeByEmpNo(string empNo)
         {
             const string sql = @"SELECT * FROM empmast e 
-                                INNER JOIN desmast d ON e.designation = d.desid 
-                                INNER JOIN labmast l ON e.labcode = l.labcode  
+                               left JOIN desmast d ON e.designation = d.desid 
+                                left JOIN labmast l ON e.labcode = l.labcode  
                                 WHERE empno = @empno";
 
             using (var conn = new MySqlConnection(_connStr))
@@ -44,8 +44,8 @@ namespace CLRIQTR.Data.Repositories.Implementations
         {
             const string sql = @"SELECT e.*, d.DesDesc, l.LabName,q.qtrno,q.occdate,q.qtrtype,q.qtrstatus
                          FROM empmast e
-                         INNER JOIN desmast d ON e.Designation = d.DesId
-                         INNER JOIN labmast l ON e.LabCode = l.LabCode
+                         left JOIN desmast d ON e.Designation = d.DesId
+                         left JOIN labmast l ON e.LabCode = l.LabCode
                          left JOIN qtrupd q ON q.empno = e.empno 
                          WHERE e.EmpNo = @empNo";
 
@@ -270,7 +270,7 @@ namespace CLRIQTR.Data.Repositories.Implementations
                 Gender = reader["gender"] as string,
                 PayLvl = reader["paylvl"] as string,
                 Designation = reader["designation"] as string,
-                DesDesc = reader["desdesc"] as string,
+                //DesDesc = reader["desdesc"] as string,
                 DOB = reader["dob"] as string,
                 DOJ = reader["doj"] as string,
                 BasicPay = reader["basicpay"] == DBNull.Value ? (int?)null : Convert.ToInt32(reader["basicpay"]),

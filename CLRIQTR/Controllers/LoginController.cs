@@ -61,12 +61,23 @@ namespace CLRIQTR.Controllers
 
         private void LoadLabs()
         {
-            // USING RAW SQL REPOSITORY
-            var labs = _lookupRepo.GetLabs()
-                .Select(l => new { Value = l.LabCode, Text = l.LabName })
-                .ToList();
+            try
+            {
+                // Attempt to get the labs from the database
+                var labs = _lookupRepo.GetLabs()
+                    .Select(l => new { Value = l.LabCode, Text = l.LabName })
+                    .ToList();
 
-            ViewBag.Labs = new SelectList(labs, "Value", "Text");
+                ViewBag.Labs = new SelectList(labs, "Value", "Text");
+            }
+            catch (Exception ex)
+            {
+                // This will display the REAL error on your login page for debugging.
+                ViewBag.Error = "DATABASE ERROR: " + ex.Message;
+
+                // IMPORTANT: Give the ViewBag an empty list to prevent the page from crashing.
+                ViewBag.Labs = new SelectList(Enumerable.Empty<SelectListItem>());
+            }
         }
 
         //protected override void Dispose(bool disposing)

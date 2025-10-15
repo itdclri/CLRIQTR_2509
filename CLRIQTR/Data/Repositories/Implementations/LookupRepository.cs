@@ -25,11 +25,20 @@ namespace CLRIQTR.Data.Repositories.Implementations
                 {
                     while (reader.Read())
                     {
-                        list.Add(new LabMast
+                        var lab = new LabMast();
+
+                        // Safely handle potential NULL values from the database
+                        if (reader["labcode"] != DBNull.Value)
                         {
-                            LabCode = Convert.ToInt32(reader["labcode"]),
-                            LabName = reader["labname"].ToString()
-                        });
+                            lab.LabCode = Convert.ToInt32(reader["labcode"]);
+                        }
+
+                        if (reader["labname"] != DBNull.Value)
+                        {
+                            lab.LabName = reader["labname"].ToString();
+                        }
+
+                        list.Add(lab);
                     }
                 }
             }

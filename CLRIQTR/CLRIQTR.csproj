@@ -274,6 +274,7 @@
     <Content Include="Views\Admin\Final.cshtml" />
     <Content Include="Views\Admin\Rule.cshtml" />
     <Content Include="Views\Admin\Tentative.cshtml" />
+    <Content Include="Views\Admin\RoomStatusView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

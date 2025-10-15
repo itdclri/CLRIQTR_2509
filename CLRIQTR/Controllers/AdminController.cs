@@ -613,6 +613,17 @@ namespace CLRIQTR.Controllers
         }
 
 
+        public ActionResult RoomStatusView() 
+        {
+           
+
+            // This fetches the list of quarter types and adds it to the ViewBag
+            ViewBag.QtrTypes = new SelectList(_quarterService.GetQuarterTypes(), "Code", "Description");
+
+            return View();
+        }
+
+
 
     }
 }

@@ -433,48 +433,27 @@
         });
 
 
-        const activeDropdown = $('#Active');
-        const dorInput = $('#DOR_dt');
-        const dorError = $('#dor-error');
+        var activeChanged = false;
 
-        // 1. A function to handle the validation logic
-        function validateDor() {
-            // Get the TEXT of the selected option (e.g., "Active", "Retired")
-            const selectedStatus = activeDropdown.find('option:selected').text();
-
-            // If the status is NOT "Active" and the DOR date is empty...
-            if (selectedStatus !== 'Active' && dorInput.val() === '') {
-                dorError.show(); // ...show the error message.
-                return false;    // ...and indicate that validation failed.
-            }
-            // Otherwise...
-            else {
-                dorError.hide(); // ...hide the error message.
-                return true;     // ...and indicate that validation passed.
-            }
-        }
-
-        // 2. Run the validation when the 'Active' dropdown changes
-        activeDropdown.on('change', function () {
-            validateDor();
+        $('#Active').change(function () {
+            activeChanged = true;
+            $('#DOR_dt').val('');
+            $('#dor-error').hide(); // hide error when changing active
         });
 
-        // Also run it when the user picks a date, to hide the error immediately
-        dorInput.on('change', function () {
-            validateDor();
-        });
-
-        // 3. Prevent the form from submitting if the validation fails
         $('form').submit(function (e) {
-            if (!validateDor()) {
-                // If the validation function returns false...
-                alert('Please provide the Date of Superannuation as the employee status is not Active.');
-                e.preventDefault(); // ...stop the form submission.
+            if (activeChanged) {
+                var dor = $('#DOR_dt').val();
+                if (!dor) {
+                    e.preventDefault();
+                    $('#dor-error').show();
+                    $('#DOR_dt').focus();
+                    return false;
+                } else {
+                    $('#dor-error').hide();
+                }
             }
         });
-
-        // 4. Run the check once when the page first loads
-        validateDor();
 
     });
     </script>

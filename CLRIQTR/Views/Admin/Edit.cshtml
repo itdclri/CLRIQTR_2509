@@ -104,6 +104,7 @@
     @Html.AntiForgeryToken()
 
     @Html.HiddenFor(m => m.EmpNo)
+    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
 
     <div class="form-horizontal">
         <div class="form-group">
@@ -117,7 +118,7 @@
         @{
             // A dictionary to map lab codes to their display names
             var labNames = new Dictionary<int, string>
-        {
+    {
                 { 100, "CLRI" },
                 { 101, "SERC" },
                 { 102, "CMC" }
@@ -250,7 +251,7 @@
 
     <div class="form-group create-center-button">
         <input type="submit" value="Update" class="btn btn-primary" />
-        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-default" })
+        <a href="@(ViewBag.ReturnUrl ?? Url.Action("Index"))" class="btn btn-default">Back</a>
     </div>
 }
 
@@ -271,7 +272,7 @@
         </thead>
         <tbody>
             @if (Model.Dependents != null)
-            {  
+            {
                 foreach (var dep in Model.Dependents)
                 {
                     <tr data-id="@dep.Id" data-empno="@Model.EmpNo">
@@ -285,8 +286,8 @@
                         </td>
                     </tr>
                 }
-            } 
-           
+            }
+
         </tbody>
     </table>
 

@@ -101,36 +101,37 @@
     {
         @Html.AntiForgeryToken()
         @Html.HiddenFor(m => m.empno)
+        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
 
         <!-- Quarter Type -->
         <div class="form-group">
             <label class="control-label">Quarters Type</label>
             @Html.DropDownListFor(m => m.qtrtype,
-                               (SelectList)ViewBag.QtrTypes,
-                               "Select Quarters Type",
-                               new { @class = "form-control", id = "QtrTypeDropdown" })
+                                    (SelectList)ViewBag.QtrTypes,
+                                    "Select Quarters Type",
+                                    new { @class = "form-control", id = "QtrTypeDropdown" })
         </div>
 
         <!-- FN / AN -->
         <div class="form-group">
             <label class="control-label">Forenoon / Afternoon</label>
             @Html.DropDownListFor(m => m.FNAN,
-                               new List<SelectListItem> {
+                                    new List<SelectListItem> {
                     new SelectListItem{ Text="Forenoon", Value="FN" },
                     new SelectListItem{ Text="Afternoon", Value="AN" }
-                                           }, "Select Time",
-                               new { @class = "form-control" })
+                                                    }, "Select Time",
+                                    new { @class = "form-control" })
         </div>
 
         <!-- Status -->
         <div class="form-group">
             <label class="control-label">Quarters Status</label>
             @Html.DropDownListFor(m => m.qtrstatus,
-                               new List<SelectListItem> {
+                                    new List<SelectListItem> {
                     new SelectListItem{ Text="Occupied", Value="O" },
                     new SelectListItem{ Text="Vacant", Value="V" }
-                                           }, "Select Status",
-                               new { @class = "form-control" })
+                                                    }, "Select Status",
+                                    new { @class = "form-control" })
         </div>
 
         <!-- Quarter Numbers (Checkbox List) -->
@@ -163,12 +164,12 @@
                 @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-default" })
             </div>
         </div>-->
-       <br />
+        <br />
 
         <div class="form-group" style="margin-top: 0;">
             <div class="col-md-offset-2 col-md-10" style="text-align: center;">
                 <input type="submit" value="Save" class="btn btn-primary" />
-                @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-default" })
+                <a href="@(ViewBag.ReturnUrl ?? Url.Action("Index"))" class="btn btn-default">Back</a>
             </div>
         </div>
 

@@ -190,15 +190,74 @@ namespace CLRIQTR.Controllers
             return View(emp);
         }
 
-       
-        public ActionResult Edit(string id)
+
+        //public ActionResult Edit(string id)
+        //{
+        //    Debug.WriteLine("Edit",id);
+        //    var labcode = Session["LabCode"];
+
+        //    if (id == null)
+        //    {
+
+        //        return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+        //    }
+
+        //    var emp = _employeeRepo.GetEmployeeByEmpNo(id);
+        //    if (emp == null)
+        //    {
+        //        return HttpNotFound();
+        //    }
+
+
+        //    emp.Dependents = _employeeRepo.GetDependentsByEmpNo(id);
+
+        //    if (!string.IsNullOrEmpty(emp.DOB)) DateTime.TryParseExact(emp.DOB, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dob);
+        //    if (!string.IsNullOrEmpty(emp.DOJ)) DateTime.TryParseExact(emp.DOJ, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime doj);
+        //    if (!string.IsNullOrEmpty(emp.DOP)) DateTime.TryParseExact(emp.DOP, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dop);
+        //    if (!string.IsNullOrEmpty(emp.DOR)) DateTime.TryParseExact(emp.DOR, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dor);
+
+        //    LoadDropdowns(emp.LabCode, emp.Designation);
+        //    return View(emp);
+        //}
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Edit(EmpMastTest emp)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            emp.DOB = emp.DOB_dt?.ToString("dd-MM-yyyy");
+        //            emp.DOJ = emp.DOJ_dt?.ToString("dd-MM-yyyy");
+        //            emp.DOP = emp.DOP_dt?.ToString("dd-MM-yyyy");
+        //            emp.DOR = emp.DOR_dt?.ToString("dd-MM-yyyy");
+
+        //            _employeeRepo.UpdateEmployee(emp);
+
+        //            //_employeeRepo.UpdateDependents(emp.EmpNo, emp.Dependents);
+
+
+        //            TempData["Message"] = "Employee and dependents updated successfully!";
+        //            return RedirectToAction("Index");
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            ModelState.AddModelError("", "An error occurred while updating: " + ex.Message);
+        //        }
+        //    }
+
+        //    LoadDropdowns(emp.LabCode, emp.Designation);
+        //    return View(emp);
+        //}
+
+        public ActionResult Edit(string id, string returnUrl) // 1. Add returnUrl parameter
         {
-            Debug.WriteLine("Edit",id);
+            Debug.WriteLine("Edit", id);
             var labcode = Session["LabCode"];
 
             if (id == null)
             {
-
                 return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
             }
 
@@ -208,7 +267,6 @@ namespace CLRIQTR.Controllers
                 return HttpNotFound();
             }
 
-           
             emp.Dependents = _employeeRepo.GetDependentsByEmpNo(id);
 
             if (!string.IsNullOrEmpty(emp.DOB)) DateTime.TryParseExact(emp.DOB, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dob);
@@ -217,12 +275,15 @@ namespace CLRIQTR.Controllers
             if (!string.IsNullOrEmpty(emp.DOR)) DateTime.TryParseExact(emp.DOR, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dor);
 
             LoadDropdowns(emp.LabCode, emp.Designation);
+
+            ViewBag.ReturnUrl = returnUrl; // 2. Pass the URL to the view
+
             return View(emp);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(EmpMastTest emp)
+        public ActionResult Edit(EmpMastTest emp, string returnUrl) 
         {
             if (ModelState.IsValid)
             {
@@ -237,9 +298,17 @@ namespace CLRIQTR.Controllers
 
                     //_employeeRepo.UpdateDependents(emp.EmpNo, emp.Dependents);
 
-                  
                     TempData["Message"] = "Employee and dependents updated successfully!";
-                    return RedirectToAction("Index");
+
+                    // 2. THIS IS THE KEY CHANGE. Redirect back to the filtered list.
+                    if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                    {
+                        return Redirect(returnUrl);
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index"); // Fallback to default
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -248,6 +317,7 @@ namespace CLRIQTR.Controllers
             }
 
             LoadDropdowns(emp.LabCode, emp.Designation);
+            ViewBag.ReturnUrl = returnUrl; // 3. IMPORTANT: Pass the URL back if validation fails
             return View(emp);
         }
 
@@ -268,15 +338,16 @@ namespace CLRIQTR.Controllers
             return RedirectToAction("Index");
         }
 
-      
+
         // QUARTER MANAGEMENT (NEW IMPLEMENTATION)
-      
-        public ActionResult QuarterDetails(string empNo)
+
+        public ActionResult QuarterDetails(string empNo, string returnUrl)
         {
             var model = _quarterService.GetQuarterDetails(empNo);
+            var quarterTypes = _quarterService.GetQuarterTypes();
 
-            
-            var quarterTypes = _quarterService.GetQuarterTypes(); 
+            ViewBag.ReturnUrl = returnUrl;
+
             if (model == null)
             {
                 ViewBag.QtrTypes = new SelectList(quarterTypes, "Code", "Description");
@@ -287,31 +358,29 @@ namespace CLRIQTR.Controllers
             return View("UpdateQuarterDetails", model);
         }
 
-
         [HttpGet]
-        public ActionResult UpdateQuarterDetails(string empNo)
+        public ActionResult UpdateQuarterDetails(string empNo, string returnUrl)
         {
-            return QuarterDetails(empNo);
+            return QuarterDetails(empNo, returnUrl);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult UpdateQuarterDetails(QtrUpd model, string[] selectedParts)
+        public ActionResult UpdateQuarterDetails(QtrUpd model, string[] selectedParts, string returnUrl)
         {
             Debug.WriteLine("Update - V");
-            return ProcessQuarterForm(model, selectedParts, true) ;
+            return ProcessQuarterForm(model, selectedParts, true, returnUrl);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult InsertQuarterDetails(QtrUpd model, string[] selectedParts)
+        public ActionResult InsertQuarterDetails(QtrUpd model, string[] selectedParts, string returnUrl)
         {
-            return ProcessQuarterForm(model, selectedParts, false);
+            return ProcessQuarterForm(model, selectedParts, false, returnUrl);
         }
 
-        private ActionResult ProcessQuarterForm(QtrUpd model, string[] selectedParts, bool isUpdate)
+        private ActionResult ProcessQuarterForm(QtrUpd model, string[] selectedParts, bool isUpdate, string returnUrl)
         {
-
             Debug.WriteLine("Update - V1");
 
             if (ModelState.IsValid)
@@ -321,19 +390,29 @@ namespace CLRIQTR.Controllers
                 if (result.Success)
                 {
                     TempData["Message"] = result.Message;
-                    return RedirectToAction("UpdateQuarterDetails", new { empNo = result.RedirectEmpNo });
+
+                    if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                    {
+                        return Redirect(returnUrl);
+                    }
+                    else
+                    {
+                        return RedirectToAction("UpdateQuarterDetails", new { empNo = result.RedirectEmpNo });
+                    }
                 }
 
                 ModelState.AddModelError("", result.Message);
             }
 
             ViewBag.QtrTypes = new SelectList(_quarterService.GetQuarterTypes(), "Code", "Description", model.qtrtype);
+            ViewBag.ReturnUrl = returnUrl;
+
             return View(isUpdate ? "UpdateQuarterDetails" : "InsertQuarterDetails", model);
         }
 
-        
+
         // AJAX METHODS
-       
+
         public JsonResult GetPartsByQtr(string qtrType, string empNo = null)
         {
             try

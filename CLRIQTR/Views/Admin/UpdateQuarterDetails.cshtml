@@ -115,7 +115,7 @@
         <!-- BUTTONS -->
         <div class="quarter-actions mb-3 mt-3 text-end" id="buttonContainer">
             <button type="button" class="btn btn-primary" id="editStatusBtn">Edit Quarter Status</button>
-            @Html.ActionLink("Back", "Index", "Admin", null, new { @class = "btn btn-secondary ml-2", id = "backBtn" })
+            <a href="@(ViewBag.ReturnUrl ?? Url.Action("Index"))" class="btn btn-secondary ml-2" id="backBtn">Back</a>        
         </div>
     </div>
 
@@ -126,6 +126,7 @@
             @Html.AntiForgeryToken()
             @Html.HiddenFor(m => m.empno)
             @Html.HiddenFor(m => m.qtrno)
+            <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
 
             <h4 class="text-center mb-3">Update Quarter Status</h4>
 
@@ -139,9 +140,9 @@
             <div class="form-group" id="newQuarterTypeGroup" style="display:none;">
                 <label class="control-label">New Quarter Type</label>
                 @Html.DropDownListFor(m => m.qtrtype,
-                         (SelectList)ViewBag.QtrTypes,
-                         "Select Quarter Type",
-                         new { @class = "form-control", id = "QtrTypeDropdown" })
+                              (SelectList)ViewBag.QtrTypes,
+                              "Select Quarter Type",
+                              new { @class = "form-control", id = "QtrTypeDropdown" })
             </div>
 
             <!-- New Quarter Numbers Checkbox List (hidden initially) -->
@@ -175,12 +176,12 @@
             <div class="form-group">
                 <label class="control-label" for="FNAN">Forenoon / Afternoon</label>
                 @Html.DropDownListFor(m => m.FNAN,
-                         new List<SelectListItem> {
+                              new List<SelectListItem> {
                         new SelectListItem{ Text="Forenoon", Value="FN", Selected = Model.FNAN == "FN" },
                         new SelectListItem{ Text="Afternoon", Value="AN", Selected = Model.FNAN == "AN" }
-                         },
-                         "Select Time",
-                         new { @class = "form-control" })
+                              },
+                              "Select Time",
+                              new { @class = "form-control" })
                 @Html.ValidationMessageFor(m => m.FNAN, "", new { @class = "text-danger" })
             </div>
 

@@ -200,12 +200,12 @@
                             <button type="button" class="btn btn-sm btn-success view-btn" data-empno="@item.EmpNo">
                                 <i class="bi bi-eye-fill"></i> View
                             </button>
-                            <a href="@Url.Action("Edit", "Admin", new { id = item.EmpNo })" class="btn btn-sm btn-info">
+                            <a href="@Url.Action("Edit", "Admin", new { id = item.EmpNo, returnUrl = Request.RawUrl })" class="btn btn-sm btn-info">
                                 <i class="bi bi-pencil-square"></i> Edit
                             </a>
                             @if (item.LabCode == 100)
                             {
-                                <a href="@Url.Action("UpdateQuarterDetails", "Admin", new { empNo = item.EmpNo })" class="btn btn-sm btn-primary">
+                                <a href="@Url.Action("UpdateQuarterDetails", "Admin", new { empNo = item.EmpNo, returnUrl = Request.RawUrl })" class="btn btn-sm btn-primary">
                                     <i class="bi bi-key-fill"></i> Update Quarters
                                 </a>
                             }

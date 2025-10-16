@@ -180,7 +180,7 @@
     <tbody>
         @if (Model != null && Model.Any())
         {
-            int slNo = 1; // 2. Initialized a counter variable
+            int slNo = (currentPage - 1) * pageSize + 1;
             foreach (var item in Model)
             {
                 <tr>

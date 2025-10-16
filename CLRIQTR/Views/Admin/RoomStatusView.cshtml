@@ -8,73 +8,54 @@
     <div class="container">
         @* Left-aligned nav links *@
         <ul class="navbar-nav me-auto">
-
             <li class="nav-item">
-                <a class="nav-link " href="@Url.Action("Index", "Admin")">
-                    <i class="bi bi-house-door-fill"></i> Home
-                </a>
+                <a class="nav-link " href="@Url.Action("Index", "Admin")"><i class="bi bi-house-door-fill"></i> Home</a>
             </li>
-
             @if (Session["LabCode"] != null && Session["LabCode"].ToString() == "100")
             {
                 <li class="nav-item">
-                    <a class="nav-link" href="@Url.Action("GenerateTentativeReport", "Admin")">
-                        <i class="bi bi-file-earmark-text"></i> Generate Tentative Report
-                    </a>
+                    <a class="nav-link" href="@Url.Action("GenerateTentativeReport", "Admin")"><i class="bi bi-file-earmark-text"></i> Generate Tentative Report</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="@Url.Action("GenerateFinalReport", "Admin")">
-                        <i class="bi bi-file-earmark-check-fill"></i> Generate Final Report
-                    </a>
+                    <a class="nav-link" href="@Url.Action("GenerateFinalReport", "Admin")"><i class="bi bi-file-earmark-check-fill"></i> Generate Final Report</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="@Url.Action("Rule", "Admin")">
-                        <i class="bi bi-journal-text"></i> Rule 10.1
-                    </a>
+                    <a class="nav-link" href="@Url.Action("Rule", "Admin")"><i class="bi bi-journal-text"></i> Rule 10.1</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="@Url.Action("RoomStatusView", "Admin")">
-                        <span><i class="bi bi-door-open-fill"></i> Room Status</span> 
-                    </a>
+                    <a class="nav-link active" href="@Url.Action("RoomStatusView", "Admin")"><span><i class="bi bi-door-open-fill"></i> Quarters Status</span></a>
                 </li>
-               
-
             }
         </ul>
-
         @* Right-aligned user info *@
         <div class="d-flex align-items-center ms-auto">
-
             <div class="navbar-text me-3">
                 <i class="bi bi-person-badge"></i> Employee Number : <b>@Session["EmpNo"]</b><br />
                 <i class="bi bi-building"></i> Lab Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <b>
-                    @{
-                        if (Session["LabCode"] != null)
-                        {
-                            switch (Session["LabCode"].ToString())
-                            {
-                                case "100":
-                                    @:CLRI
-                                    break;
-                                case "101":
-                                    @:SERC
-                                    break;
-                                case "102":
-                                    @:CMC
-                                    break;
-                            }
-                        }
-                    }
-                </b>
+    @{
+        if (Session["LabCode"] != null)
+        {
+            switch (Session["LabCode"].ToString())
+            {
+                case "100":
+                    @:CLRI
+                    break;
+                case "101":
+                    @:SERC
+                    break;
+                case "102":
+                    @:CMC
+                    break;
+            }
+        }
+    }
+</b>
             </div>
         </div>
-
         @* Logout Button *@
         <ul class="navbar-nav mb-0">
             <li class="nav-item">
-                <a class="nav-link text-danger" style="font-size: 1.1rem;" href="@Url.Action("Logout", "Admin")">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
+                <a class="nav-link text-danger" style="font-size: 1.1rem;" href="@Url.Action("Logout", "Admin")"><i class="bi bi-box-arrow-right"></i> Logout</a>
             </li>
         </ul>
     </div>
@@ -82,21 +63,16 @@
 
 <h2>Room Status</h2>
 
-
-
 <div class="form-group">
     <label class="control-label">Quarters Type</label>
-    @Html.DropDownListFor(m => m.qtrtype,
-                          (SelectList)ViewBag.QtrTypes,
-                          "Select Quarters Type",
-                          new { @class = "form-control", id = "QtrTypeDropdown" })
+    @Html.DropDownListFor(m => m.qtrtype, (SelectList)ViewBag.QtrTypes, "Select Quarters Type", new { @class = "form-control", id = "QtrTypeDropdown" })
 </div>
 
 <hr />
 
 <div class="form-group">
     <label class="control-label">Quarters Status</label>
-    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
@@ -115,9 +91,37 @@
     </div>
 </div>
 
+<div class="modal fade" id="roomRemarksModal" tabindex="-1" aria-labelledby="roomRemarksModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="roomRemarksModalLabel">Edit Room Remarks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Quarter Number:</strong> <span id="modalQtrNo"></span></p>
+
+                <input type="hidden" id="hiddenQtrNo" />
+
+                <div class="mb-3">
+                    <label for="remarksText" class="form-label">Remarks</label>
+                    <textarea class="form-control" id="remarksText" rows="4" placeholder="Enter remarks..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div id="modalAlertPlaceholder" class="w-100 mb-2"></div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveRemarkBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @section Scripts {
     <script type="text/javascript">
 $(document).ready(function () {
+    // Original script to fetch and display quarter statuses
     $('#QtrTypeDropdown').on('change', function () {
         var selectedQtrType = $(this).val();
         var tableBody = $('#QuarterStatusTableBody');
@@ -137,17 +141,30 @@ $(document).ready(function () {
                 tableBody.empty();
                 if (parts && parts.length > 0) {
                     $.each(parts, function (index, item) {
-
-                        // Using the CORRECT property names from your JSON
                         var isOccupied = item.OccupiedBy && String(item.OccupiedBy).trim() !== '';
                         var statusText = isOccupied ? '<span class="text-danger">Occupied</span>' : '<span class="text-success">Vacant</span>';
                         var occupiedByText = isOccupied ? item.OccupiedBy : '';
 
+                        // --- MODIFICATION START ---
+                        // Added data-* attributes to the Remarks button to trigger the modal
+                        var actionButtons = '<td>' +
+                            '<button type="button" class="btn btn-info btn-sm me-1">View History</button>' +
+                            '<button type="button" class="btn btn-secondary btn-sm remarks-btn" ' +
+                                'data-bs-toggle="modal" ' +
+                                'data-bs-target="#roomRemarksModal" ' +
+                                'data-qtr-no="' + item.PartNumber + '" ' +
+                                'data-remarks="' + (item.Remarks || '') + '">' + // Assumes your JSON has a 'Remarks' property
+                                'Remarks' +
+                            '</button>' +
+                            '</td>';
+                        // --- MODIFICATION END ---
+
                         var row = '<tr>' +
-                                    '<td>' + item.PartNumber + '</td>' +
-                                    '<td>' + statusText + '</td>' +
-                                    '<td>' + occupiedByText + '</td>' +
-                                  '</tr>';
+                            '<td>' + item.PartNumber + '</td>' +
+                            '<td>' + statusText + '</td>' +
+                            '<td>' + occupiedByText + '</td>' +
+                            actionButtons +
+                            '</tr>';
 
                         tableBody.append(row);
                     });
@@ -156,10 +173,85 @@ $(document).ready(function () {
                 }
             },
             error: function (xhr, status, error) {
-                tableBody.empty();
-                tableBody.append('<tr><td colspan="4" class="text-center text-danger">An error occurred. Check F12 console.</td></tr>');
+                tableBody.empty().append('<tr><td colspan="4" class="text-center text-danger">An error occurred.</td></tr>');
                 console.error("AJAX Error:", status, error, xhr.responseText);
             }
+        });
+    });
+
+    // ========================================================================
+    // NEW: Script to handle the Remarks Modal functionality
+    // ========================================================================
+    const roomRemarksModal = document.getElementById('roomRemarksModal');
+    const saveButton = document.getElementById('saveRemarkBtn');
+    const alertPlaceholder = document.getElementById('modalAlertPlaceholder');
+
+    const showAlert = (message, type) => {
+        alertPlaceholder.innerHTML = [
+            `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+            `   <div>${message}</div>`,
+            '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+            '</div>'
+        ].join('');
+    };
+
+    // When the modal is about to be shown, populate it with data from the clicked button
+    roomRemarksModal.addEventListener('show.bs.modal', function (event) {
+        alertPlaceholder.innerHTML = ''; // Clear previous alerts
+        const button = event.relatedTarget; // The button that triggered the modal
+
+        const qtrNo = button.getAttribute('data-qtr-no');
+        const remarks = button.getAttribute('data-remarks');
+
+        // Populate the modal with the data
+        roomRemarksModal.querySelector('#modalQtrNo').textContent = qtrNo;
+        roomRemarksModal.querySelector('#hiddenQtrNo').value = qtrNo;
+        roomRemarksModal.querySelector('#remarksText').value = remarks || '';
+    });
+
+    // When the 'Save Changes' button is clicked
+    saveButton.addEventListener('click', function () {
+        const qtrNo = document.getElementById('hiddenQtrNo').value;
+        const remarks = document.getElementById('remarksText').value;
+
+        if (!remarks.trim()) {
+            showAlert('Remarks cannot be empty.', 'warning');
+            return;
+        }
+
+        const originalButtonText = saveButton.innerHTML;
+        saveButton.disabled = true;
+        saveButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...`;
+
+        const data = { QtrNo: qtrNo, Remarks: remarks };
+
+        // IMPORTANT: This calls a NEW controller action 'SaveRoomRemark'
+        fetch('@Url.Action("SaveRoomRemark", "Admin")', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                showAlert('Remarks saved successfully!', 'success');
+                // You might want to update the button's data-remarks attribute on the page here
+                // For now, we just close the modal.
+                setTimeout(() => {
+                    const modalInstance = bootstrap.Modal.getInstance(roomRemarksModal);
+                    modalInstance.hide();
+                }, 1500);
+            } else {
+                showAlert(`Error saving remarks: ${result.message}`, 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('An unexpected network error occurred.', 'danger');
+        })
+        .finally(() => {
+            saveButton.disabled = false;
+            saveButton.innerHTML = originalButtonText;
         });
     });
 });

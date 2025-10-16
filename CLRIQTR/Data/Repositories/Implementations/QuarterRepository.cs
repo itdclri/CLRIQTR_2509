@@ -544,7 +544,7 @@ ORDER BY qm.qtr_no";
         ELSE 0 
     END AS Occupied,
     MAX(CASE WHEN qu.qtrstatus = 'O' THEN qu.empno ELSE NULL END) AS OccupiedBy,
-    MAX(CASE WHEN qu.qtrstatus = 'O' AND qu.empno = @currentEmpNo THEN 1 ELSE 0 END) AS IsCurrentUser
+    MAX(CASE WHEN qu.qtrstatus = 'O' AND qu.empno = @currentEmpNo THEN 1 ELSE 0 END) AS IsCurrentUser,QU.REM AS REM
 FROM qtr_master qm
 LEFT JOIN qtrupd qu 
     ON (
@@ -554,8 +554,8 @@ LEFT JOIN qtrupd qu
     )
     AND qm.qtr_type = qu.qtrtype
 WHERE qm.qtr_type = @qtrtype
-GROUP BY qm.qtr_no
-ORDER BY qm.qtr_no";
+GROUP BY qm.qtr_no,QU.REM
+ORDER BY qm.qtr_no ";
 
             return ExecuteQuery(sql, cmd =>
             {
@@ -572,7 +572,8 @@ ORDER BY qm.qtr_no";
                             PartNumber = reader["PartNumber"].ToString(),
                             Occupied = Convert.ToBoolean(reader["Occupied"]),
                             OccupiedBy = reader["OccupiedBy"] as string,
-                            IsCurrentUser = Convert.ToBoolean(reader["IsCurrentUser"])
+                            IsCurrentUser = Convert.ToBoolean(reader["IsCurrentUser"]),
+                            Remarks = reader["REM"].ToString(),
                         });
                     }
                 }

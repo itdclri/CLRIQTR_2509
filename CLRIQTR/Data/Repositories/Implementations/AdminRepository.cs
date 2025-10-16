@@ -1305,5 +1305,39 @@ namespace CLRIQTR.Repositories
         }
 
 
+        //public void UpdateRoomRemark(string qtrNo, string remarks)
+        //{
+        //    // Ensure you have a 'connectionString' variable available in this class
+        //    using (var conn = new MySqlConnection(connectionString))
+        //    {
+        //        try
+        //        {
+        //            conn.Open();
+
+        //            // The SQL statement now directly updates the record.
+        //            // It will affect rows where QtrNo matches, and do nothing if no match is found.
+        //            string sql = "UPDATE qtrupd SET rem = @remarks WHERE QtrNo = @qtrNo";
+
+        //            using (var cmd = new MySqlCommand(sql, conn))
+        //            {
+        //                // Add parameters to prevent SQL injection
+        //                cmd.Parameters.AddWithValue("@qtrNo", qtrNo);
+        //                cmd.Parameters.AddWithValue("@remarks", remarks);
+
+        //                // Execute the command
+        //                cmd.ExecuteNonQuery();
+        //            }
+        //        }
+        //        catch (MySqlException ex)
+        //        {
+        //            // Log the database-specific error and re-throw to be handled by the controller.
+        //            Console.WriteLine($"A database error occurred: {ex.Message}");
+        //            throw;
+        //        }
+        //    }
+        //}
+
+
+
     }
 }

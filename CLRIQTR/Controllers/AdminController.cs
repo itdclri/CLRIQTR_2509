@@ -729,6 +729,14 @@ namespace CLRIQTR.Controllers
         //    }
         //}
 
+        public ActionResult Applications()
+        {
+
+
+
+            var model = _employeeRepo.GetAllCompletedApplications();
+            return View(model ?? new List<CompletedApplicationViewModel>());
+        }
 
 
     }

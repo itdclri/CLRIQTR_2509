@@ -1,0 +1,126 @@
+﻿@model IEnumerable<CLRIQTR.Models.CompletedApplicationViewModel>
+@{
+    ViewBag.Title = "Applications";
+}
+
+<h2>@ViewBag.Title</h2>
+<hr />
+
+<nav class="navbar navbar-expand navbar-light bg-light mb-4">
+    <div class="container">
+        @* Left-aligned nav links *@
+        <ul class="navbar-nav me-auto">
+
+            <li class="nav-item">
+                <a class="nav-link " href="@Url.Action("Index", "Admin")">
+                    <i class="bi bi-house-door-fill"></i> Home
+                </a>
+            </li>
+
+            @if (Session["LabCode"] != null && Session["LabCode"].ToString() == "100")
+            {
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("GenerateTentativeReport", "Admin")">
+                        <i class="bi bi-file-earmark-text"></i> Generate Tentative Report
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="@Url.Action("GenerateFinalReport", "Admin")">
+                        <i class="bi bi-file-earmark-check-fill"></i> Generate Final Report
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="@Url.Action("Rule", "Admin")">
+                        <i class="bi bi-journal-text"></i> Rule 10.1
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="@Url.Action("RoomStatusView", "Admin")">
+                        <span><i class="bi bi-door-open-fill"></i> Quarters Status</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="@Url.Action("Applications", "Admin")">
+                        <span><i class="bi bi-file"></i> Applications</span>
+                    </a>
+                </li>
+            }
+        </ul>
+
+        @* Right-aligned user info *@
+        <div class="d-flex align-items-center ms-auto">
+
+            <div class="navbar-text me-3">
+                <i class="bi bi-person-badge"></i> Employee Number : <b>@Session["EmpNo"]</b><br />
+                <i class="bi bi-building"></i> Lab Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <b>
+                    @{
+                        if (Session["LabCode"] != null)
+                        {
+                            switch (Session["LabCode"].ToString())
+                            {
+                                case "100":
+                                    @:CLRI
+                                    break;
+                                case "101":
+                                    @:SERC
+                                    break;
+                                case "102":
+                                    @:CMC
+                                    break;
+                            }
+                        }
+                    }
+                </b>
+            </div>
+        </div>
+
+        @* Logout Button *@
+        <ul class="navbar-nav mb-0">
+            <li class="nav-item">
+                <a class="nav-link text-danger" style="font-size: 1.1rem;" href="@Url.Action("Logout", "Admin")">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<table class="table table-bordered table-striped table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.empno)</th>
+            <th>@Html.DisplayNameFor(model => model.empname)</th>
+            <th>@Html.DisplayNameFor(model => model.desdesc)</th>
+            <th>@Html.DisplayNameFor(model => model.qtrappno)</th>
+            <th>@Html.DisplayNameFor(model => model.doa)</th>
+            <th>@Html.DisplayNameFor(model => model.appstatus)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="6" class="text-center">No completed applications found.</td>
+            </tr>
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.empno)</td>
+                    <td>@Html.DisplayFor(modelItem => item.empname)</td>
+                    <td>@Html.DisplayFor(modelItem => item.desdesc)</td>
+                    <td>@Html.DisplayFor(modelItem => item.qtrappno)</td>
+                    <td>@Html.DisplayFor(modelItem => item.doa)</td>
+                    <td>
+                        
+                            @Html.DisplayFor(modelItem => item.appstatus)
+                       
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

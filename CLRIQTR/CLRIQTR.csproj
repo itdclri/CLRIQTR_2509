@@ -193,6 +193,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AdminLogin.cs" />
+    <Compile Include="Models\CompletedApplicationViewModel.cs" />
     <Compile Include="Models\DesMast.cs" />
     <Compile Include="Models\EmpMastTest.cs" />
     <Compile Include="Models\LabMast.cs" />
@@ -275,6 +276,7 @@
     <Content Include="Views\Admin\Rule.cshtml" />
     <Content Include="Views\Admin\Tentative.cshtml" />
     <Content Include="Views\Admin\RoomStatusView.cshtml" />
+    <Content Include="Views\Admin\Applications.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

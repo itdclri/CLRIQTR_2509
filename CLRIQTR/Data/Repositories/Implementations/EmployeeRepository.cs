@@ -587,6 +587,53 @@ ON DUPLICATE KEY UPDATE
             }
         }
 
+        public IEnumerable<CompletedApplicationViewModel> GetAllCompletedApplications()
+        {
+            var sql = @"
+        -- Part 1: Get completed apps from 'eqtrapply' and join matching 'sa' apps.
+        SELECT 
+            CONCAT(
+                eq.qtrappno, 
+                IF(sa.saqtrappno IS NOT NULL, ' & ', ''), 
+                IFNULL(sa.saqtrappno, '')
+            ) AS qtrappno,
+            eq.empno,
+            e.empname,
+            d.desdesc,
+            -- Convert the string to a date here
+            STR_TO_DATE(eq.doa, '%d/%m/%Y') AS doa, 
+            'Completed' AS appstatus
+        FROM 
+            eqtrapply eq
+        INNER JOIN empmast e ON e.empno = eq.empno
+        LEFT JOIN desmast d ON d.desid = e.designation
+        LEFT JOIN saeqtrapply sa ON sa.empno = eq.empno AND sa.appstatus = 'C'
+        WHERE eq.appstatus = 'C'
+
+        UNION
+
+        -- Part 2: Get completed apps from 'saeqtrapply' that DO NOT exist in 'eqtrapply'.
+        SELECT 
+            sa.saqtrappno AS qtrappno,
+            sa.empno,
+            e.empname,
+            d.desdesc,
+            -- Also convert the string to a date here
+            STR_TO_DATE(sa.doa, '%d/%m/%Y') AS doa,
+            'Completed' AS appstatus
+        FROM 
+            saeqtrapply sa
+        INNER JOIN empmast e ON e.empno = sa.empno
+        LEFT JOIN desmast d ON d.desid = e.designation
+        LEFT JOIN eqtrapply eq ON eq.empno = sa.empno
+        WHERE sa.appstatus = 'C' AND eq.empno IS NULL;";
+
+            using (var connection = new MySqlConnection(_connStr))
+            {
+                return connection.Query<CompletedApplicationViewModel>(sql).ToList();
+            }
+        }
+
 
     }
 }

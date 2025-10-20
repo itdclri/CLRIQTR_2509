@@ -56,9 +56,9 @@
                                     @:CLRI;
                                     break;
                                 case "101": @:SERC;
-                                break;
-                                case "102": 
-                                    @:CMC; 
+                                    break;
+                                case "102":
+                                    @:CMC;
                                     break;
                             }
                         }
@@ -169,6 +169,8 @@
             </div>
         </div>
 
+
+
         <div class="form-group">
             @Html.Label("Date of Superannuation", new { @class = "control-label col-md-2" })
             <div class="col-md-4">
@@ -176,8 +178,10 @@
                 @Html.HiddenFor(m => m.DOR_dt, new { id = "DOR_dt" })
                 @Html.ValidationMessageFor(m => m.DOR_dt)
                 <span id="dor-error" class="text-danger" style="display:none;">Date of Superannuation is Required when Status is Changed.</span>
+                <span id="dor-hint" class="text-info" style="display:none;">Check Date of Superannuation</span>
             </div>
         </div>
+
 
         <div class="form-group">
             @Html.Label("BasicPay", new { @class = "control-label col-md-2" })
@@ -285,8 +289,8 @@
 
         // Initialize all datepickers, linking the visible input to its hidden counterpart
         $('#DOB_dt_display').datepicker($.extend({}, datepickerOptions, {
-            altField: '#DOB_dt',      // Hidden field for DOB
-            altFormat: 'yy-mm-dd'     // HIDDEN format for the server
+            altField: '#DOB_dt',     // Hidden field for DOB
+            altFormat: 'yy-mm-dd'    // HIDDEN format for the server
         }));
 
         $('#DOJ_dt_display').datepicker($.extend({}, datepickerOptions, {
@@ -441,22 +445,31 @@
         });
 
         // =======================================================
-        // ==  4. ACTIVE STATUS VALIDATION LOGIC
+        // ==  4. ACTIVE STATUS VALIDATION LOGIC (CORRECTED)
         // =======================================================
         var activeChanged = false;
+
+        // When Active status changes, show the blue hint
         $('#Active').change(function () {
             activeChanged = true;
-            $('#DOR_dt_display').val(''); // Clear both display and hidden fields
-            $('#DOR_dt').val('');
-            $('#dor-error').hide();
+            $('#dor-error').hide();  // Hide the red error message
+            $('#dor-hint').show();   // Show the blue hint message
         });
 
+        // When user clicks the DOR field, hide the hint
+        $('#DOR_dt_display').on('click focus', function () {
+            $('#dor-hint').hide();
+        });
+
+        // On submit, run the validation
         $('form').submit(function (e) {
+            $('#dor-hint').hide(); // Always hide the hint on submit
+
             if (activeChanged) {
                 var dor = $('#DOR_dt').val(); // Check the hidden field's value
                 if (!dor) {
-                    e.preventDefault();
-                    $('#dor-error').show();
+                    e.preventDefault(); // <-- FIXED
+                    $('#dor-error').show();  // Show the red error
                     $('#DOR_dt_display').focus(); // Focus the visible field
                     return false;
                 } else {
@@ -464,7 +477,6 @@
                 }
             }
         });
-
     });
     </script>
 }

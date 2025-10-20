@@ -85,7 +85,7 @@
                     <th>Quarter Number</th>
                     <th>Quarter Status</th>
                     <th>Occupied By</th>
-                    <th>Action</th>
+                    @*<th>Action</th>*@
                 </tr>
             </thead>
             <tbody id="QuarterStatusTableBody">
@@ -169,7 +169,7 @@ $(document).ready(function () {
                             '<td>' + item.PartNumber + '</td>' +
                             '<td>' + statusText + '</td>' +
                             '<td>' + occupiedByText + '</td>' +
-                            actionButtons +
+                            //actionButtons +
                             '</tr>';
 
                         tableBody.append(row);

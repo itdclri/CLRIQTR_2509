@@ -33,7 +33,11 @@ namespace CLRIQTR.Data.Repositories.Interfaces
         void UpdateDependent(DependentInputModel dependent);
         void DeleteDependent(int id);
 
-        IEnumerable<CompletedApplicationViewModel> GetAllCompletedApplications();
+        int GetApplicationsCount(string empNo, string empName, string status);
+
+        IEnumerable<CompletedApplicationViewModel> GetApplications(string empNo, string empName, string status, int page, int pageSize);
+
+
 
     }
 }

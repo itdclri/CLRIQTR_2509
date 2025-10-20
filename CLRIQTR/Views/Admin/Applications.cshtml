@@ -1,6 +1,11 @@
 ﻿@model IEnumerable<CLRIQTR.Models.CompletedApplicationViewModel>
 @{
     ViewBag.Title = "Applications";
+    // Pagination variables from ViewBag
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int pageSize = ViewBag.PageSize ?? 10;
+    int totalCount = ViewBag.TotalCount ?? 0;
+    int totalPages = (ViewBag.TotalPages != null && ViewBag.TotalPages > 0) ? ViewBag.TotalPages : 1;
 }
 
 <h2>@ViewBag.Title</h2>
@@ -50,7 +55,6 @@
 
         @* Right-aligned user info *@
         <div class="d-flex align-items-center ms-auto">
-
             <div class="navbar-text me-3">
                 <i class="bi bi-person-badge"></i> Employee Number : <b>@Session["EmpNo"]</b><br />
                 <i class="bi bi-building"></i> Lab Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <b>
@@ -86,9 +90,68 @@
     </div>
 </nav>
 
+<div class="index-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;">
+    <div class="right-search-section" style="flex-grow: 1;">
+
+        @using (Html.BeginForm("Applications", "Admin", FormMethod.Get, new { @class = "filter-form", style = "display: flex; align-items: center; gap: 10px; flex-wrap: wrap;" }))
+        {
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="EmpNo" style="margin-bottom: 0;">Employee Number</label>
+                <input type="text" name="EmpNo" class="form-control" placeholder="Search Employee No" value="@ViewBag.EmpNoFilter" style="min-width: 120px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="EmpName" style="margin-bottom: 0;">Employee Name</label>
+                <input type="text" name="EmpName" class="form-control" placeholder="Search Employee Name" value="@ViewBag.EmpNameFilter" style="min-width: 150px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="Status" style="margin-bottom: 0;">Application Status</label>
+                @Html.DropDownList("Status", (SelectList)ViewBag.StatusList, "-- All --", new { @class = "form-control", style = "min-width: 150px;" })
+            </div>
+
+            <div class="control-group" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-left: auto;">
+
+                <label style="font-size: 11px; margin-right: 4px; margin-bottom: 0;">Records</label>
+
+                <select name="pageSize" class="form-control" style="width: 50px; font-size: 11px; padding: 1px 2px; height: 30px;">
+                    <option value="10" @(pageSize == 10 ? "selected" : "")>10</option>
+                    <option value="20" @(pageSize == 25 ? "selected" : "")>20</option>
+                    <option value="30" @(pageSize == 30 ? "selected" : "")>30</option>
+                </select>
+
+                <div class="button-stack" style="display: flex; flex-direction: column; gap: 4px;">
+                    <button type="submit" class="btn btn-dark btn-sm">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+
+                    <a href="@Url.Action("Applications")" class="btn btn-light btn-sm" style="border: 1px solid #ccc;">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;">
+    <div class="results-count mt-2 mt-md-0">
+        @if (totalCount > 0)
+        {
+            <span>Showing @((currentPage - 1) * pageSize + 1) to @Math.Min(currentPage * pageSize, totalCount) of @totalCount Applications</span>
+        }
+        else
+        {
+            <span>No applications found</span>
+        }
+    </div>
+</div>
+
+
 <table class="table table-bordered table-striped table-hover">
     <thead class="thead-dark">
         <tr>
+            <th>Sl. No.</th>
             <th>@Html.DisplayNameFor(model => model.empno)</th>
             <th>@Html.DisplayNameFor(model => model.empname)</th>
             <th>@Html.DisplayNameFor(model => model.desdesc)</th>
@@ -101,26 +164,99 @@
         @if (!Model.Any())
         {
             <tr>
-                <td colspan="6" class="text-center">No completed applications found.</td>
+                <td colspan="7" class="text-center">No applications found.</td>
             </tr>
         }
         else
         {
+            // NEW: Serial number calculation
+            int slNo = (currentPage - 1) * pageSize + 1;
             foreach (var item in Model)
             {
                 <tr>
+                    <td>@(slNo++)</td>
                     <td>@Html.DisplayFor(modelItem => item.empno)</td>
                     <td>@Html.DisplayFor(modelItem => item.empname)</td>
                     <td>@Html.DisplayFor(modelItem => item.desdesc)</td>
                     <td>@Html.DisplayFor(modelItem => item.qtrappno)</td>
                     <td>@Html.DisplayFor(modelItem => item.doa)</td>
                     <td>
-                        
-                            @Html.DisplayFor(modelItem => item.appstatus)
-                       
+                        @Html.DisplayFor(modelItem => item.appstatus)
                     </td>
                 </tr>
             }
         }
     </tbody>
 </table>
+
+@if (totalPages > 1)
+{
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("Applications", new {
+                    EmpNo = ViewBag.EmpNoFilter,
+                    EmpName = ViewBag.EmpNameFilter,
+                    Status = ViewBag.StatusFilter,
+                    page = currentPage - 1,
+                    pageSize = pageSize
+                })">Previous</a>
+            </li>
+
+            @if (currentPage > 3)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Applications", new {
+                        EmpNo = ViewBag.EmpNoFilter,
+                        EmpName = ViewBag.EmpNameFilter,
+                        Status = ViewBag.StatusFilter,
+                        page = 1,
+                        pageSize = pageSize
+                    })">1</a>
+                </li>
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+            }
+
+            @for (int i = currentPage - 2; i <= currentPage + 2; i++)
+            {
+                if (i > 0 && i <= totalPages)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Applications", new {
+                            EmpNo = ViewBag.EmpNoFilter,
+                            EmpName = ViewBag.EmpNameFilter,
+                            Status = ViewBag.StatusFilter,
+                            page = i,
+                            pageSize = pageSize
+                        })">@i</a>
+                    </li>
+                }
+            }
+
+            @if (currentPage < totalPages - 2)
+            {
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Applications", new {
+                        EmpNo = ViewBag.EmpNoFilter,
+                        EmpName = ViewBag.EmpNameFilter,
+                        Status = ViewBag.StatusFilter,
+                        page = totalPages,
+                        pageSize = pageSize
+                    })">@totalPages</a>
+                </li>
+            }
+
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("Applications", new {
+                    EmpNo = ViewBag.EmpNoFilter,
+                    EmpName = ViewBag.EmpNameFilter,
+                    Status = ViewBag.StatusFilter,
+                    page = currentPage + 1,
+                    pageSize = pageSize
+                })">Next</a>
+            </li>
+        </ul>
+    </nav>
+}

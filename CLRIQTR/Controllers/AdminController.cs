@@ -729,13 +729,51 @@ namespace CLRIQTR.Controllers
         //    }
         //}
 
-        public ActionResult Applications()
+        public ActionResult Applications(string empNo, string empName, string status, int page = 1, int pageSize = 10)
         {
+            // 1. Set up pagination variables
+            int currentPage = page > 0 ? page : 1;
+            int currentPageSize = pageSize > 0 ? pageSize : 10;
 
+            // 2. Create the Status Filter Dropdown List
+            var statusListItems = new List<SelectListItem>
+    {
+        // Add any other common statuses you want to filter by
+        new SelectListItem { Value = "Completed", Text = "Completed" },
+        new SelectListItem { Value = "Draft", Text = "Draft" }
+    };
+            // Pass the list to the view, selecting the current filter value
+            ViewBag.StatusList = new SelectList(statusListItems, "Value", "Text", status);
 
+            try
+            {
+                // 3. Get the Total Count for pagination
+                int totalCount = _employeeRepo.GetApplicationsCount(empNo, empName, status);
 
-            var model = _employeeRepo.GetAllCompletedApplications();
-            return View(model ?? new List<CompletedApplicationViewModel>());
+                // 4. Get the Paged Data
+                var applications = _employeeRepo.GetApplications(empNo, empName, status, currentPage, currentPageSize);
+
+                // 5. Set ViewBag properties for the View
+                ViewBag.CurrentPage = currentPage;
+                ViewBag.PageSize = currentPageSize;
+                ViewBag.TotalCount = totalCount;
+                ViewBag.TotalPages = (int)Math.Ceiling((double)totalCount / currentPageSize);
+
+                // 6. Set ViewBag properties to remember filter values
+                ViewBag.EmpNoFilter = empNo;
+                ViewBag.EmpNameFilter = empName;
+                ViewBag.StatusFilter = status;
+
+                // 7. Return the paged list to the View
+                return View(applications);
+            }
+            catch (Exception ex)
+            {
+                // Handle any errors (e.g., log them, show an error page)
+                ViewBag.ErrorMessage = "An error occurred: " + ex.Message;
+                // Return view with an empty list
+                return View(new List<CompletedApplicationViewModel>());
+            }
         }
 
 

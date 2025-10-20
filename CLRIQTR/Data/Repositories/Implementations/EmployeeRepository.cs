@@ -1,13 +1,14 @@
 ﻿using CLRIQTR.Data.Repositories.Interfaces;
 using CLRIQTR.Models;
+using Dapper;
 using MySql.Data.MySqlClient;
-using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
-using Dapper;
+using System.Linq;
+using System.Text;
 
 namespace CLRIQTR.Data.Repositories.Implementations
 {
@@ -587,53 +588,140 @@ ON DUPLICATE KEY UPDATE
             }
         }
 
-        public IEnumerable<CompletedApplicationViewModel> GetAllCompletedApplications()
+        private const string BaseApplicationSql = @"
+(
+    -- Part 1: Get apps from 'eqtrapply'
+    SELECT
+        CONCAT(
+            eq.qtrappno,
+            IF(sa.saqtrappno IS NOT NULL, ' & ', ''),
+            IFNULL(sa.saqtrappno, '')
+        ) AS qtrappno,
+        eq.empno,
+        e.empname,
+        d.desdesc,
+        STR_TO_DATE(eq.doa, '%d/%m/%Y') AS doa,
+        -- Use a CASE statement for status
+        CASE
+            WHEN eq.appstatus = 'C' THEN 'Completed'
+            WHEN eq.appstatus = 'D' THEN 'Draft'
+            ELSE eq.appstatus -- Show other statuses as-is
+        END AS appstatus
+    FROM
+        eqtrapply eq
+    INNER JOIN empmast e ON e.empno = eq.empno
+    LEFT JOIN desmast d ON d.desid = e.designation
+    -- Join 'sa' regardless of status to get the combined app number
+    LEFT JOIN saeqtrapply sa ON sa.empno = eq.empno
+
+    UNION
+
+    -- Part 2: Get apps from 'saeqtrapply' that DO NOT exist in 'eqtrapply'
+    SELECT
+        sa.saqtrappno AS qtrappno,
+        sa.empno,
+        e.empname,
+        d.desdesc,
+        STR_TO_DATE(sa.doa, '%d/%m/%Y') AS doa,
+        -- Use a CASE statement for status
+        CASE
+            WHEN sa.appstatus = 'C' THEN 'Completed'
+            WHEN sa.appstatus = 'D' THEN 'Draft'
+            ELSE sa.appstatus -- Show other statuses as-is
+        END AS appstatus
+    FROM
+        saeqtrapply sa
+    INNER JOIN empmast e ON e.empno = sa.empno
+    LEFT JOIN desmast d ON d.desid = e.designation
+    LEFT JOIN eqtrapply eq ON eq.empno = sa.empno
+    -- Only get 'sa' apps if no 'eq' app exists for that employee
+    WHERE eq.empno IS NULL
+) AS AllApplications";
+
+        /// <summary>
+        /// Gets a paged and filtered list of applications.
+        /// </summary>
+        public IEnumerable<CompletedApplicationViewModel> GetApplications(string empNo, string empName, string status, int page, int pageSize)
         {
-            var sql = @"
-        -- Part 1: Get completed apps from 'eqtrapply' and join matching 'sa' apps.
-        SELECT 
-            CONCAT(
-                eq.qtrappno, 
-                IF(sa.saqtrappno IS NOT NULL, ' & ', ''), 
-                IFNULL(sa.saqtrappno, '')
-            ) AS qtrappno,
-            eq.empno,
-            e.empname,
-            d.desdesc,
-            -- Convert the string to a date here
-            STR_TO_DATE(eq.doa, '%d/%m/%Y') AS doa, 
-            'Completed' AS appstatus
-        FROM 
-            eqtrapply eq
-        INNER JOIN empmast e ON e.empno = eq.empno
-        LEFT JOIN desmast d ON d.desid = e.designation
-        LEFT JOIN saeqtrapply sa ON sa.empno = eq.empno AND sa.appstatus = 'C'
-        WHERE eq.appstatus = 'C'
+            var sqlBuilder = new StringBuilder();
+            var parameters = new DynamicParameters();
 
-        UNION
+            // Start with the base query
+            sqlBuilder.Append($"SELECT * FROM {BaseApplicationSql}");
 
-        -- Part 2: Get completed apps from 'saeqtrapply' that DO NOT exist in 'eqtrapply'.
-        SELECT 
-            sa.saqtrappno AS qtrappno,
-            sa.empno,
-            e.empname,
-            d.desdesc,
-            -- Also convert the string to a date here
-            STR_TO_DATE(sa.doa, '%d/%m/%Y') AS doa,
-            'Completed' AS appstatus
-        FROM 
-            saeqtrapply sa
-        INNER JOIN empmast e ON e.empno = sa.empno
-        LEFT JOIN desmast d ON d.desid = e.designation
-        LEFT JOIN eqtrapply eq ON eq.empno = sa.empno
-        WHERE sa.appstatus = 'C' AND eq.empno IS NULL;";
-
-            using (var connection = new MySqlConnection(_connStr))
+            // Build WHERE clause dynamically
+            var whereClause = new StringBuilder(" WHERE 1=1");
+            if (!string.IsNullOrEmpty(empNo))
             {
-                return connection.Query<CompletedApplicationViewModel>(sql).ToList();
+                whereClause.Append(" AND empno LIKE @EmpNo");
+                parameters.Add("@EmpNo", $"%{empNo}%");
+            }
+            if (!string.IsNullOrEmpty(empName))
+            {
+                whereClause.Append(" AND empname LIKE @EmpName");
+                parameters.Add("@EmpName", $"%{empName}%");
+            }
+            if (!string.IsNullOrEmpty(status))
+            {
+                whereClause.Append(" AND appstatus = @Status");
+                parameters.Add("@Status", status);
+            }
+
+            // Add the WHERE clause to the main query
+            sqlBuilder.Append(whereClause.ToString());
+
+            // Add ORDER BY, LIMIT (for page size), and OFFSET (for page number)
+            sqlBuilder.Append(" ORDER BY doa DESC");
+            sqlBuilder.Append(" LIMIT @PageSize OFFSET @Offset");
+
+            int offset = (page - 1) * pageSize;
+            parameters.Add("@PageSize", pageSize);
+            parameters.Add("@Offset", offset);
+
+            using (var connection = new MySqlConnection(_connStr)) // _connStr is your connection string
+            {
+                return connection.Query<CompletedApplicationViewModel>(sqlBuilder.ToString(), parameters).ToList();
             }
         }
 
+        /// <summary>
+        /// Gets the total count of applications for the given filters.
+        /// </summary>
+        public int GetApplicationsCount(string empNo, string empName, string status)
+        {
+            var sqlBuilder = new StringBuilder();
+            var parameters = new DynamicParameters();
+
+            // Start with a COUNT query on the base
+            sqlBuilder.Append($"SELECT COUNT(*) FROM {BaseApplicationSql}");
+
+            // Build the *exact same* WHERE clause as the GetApplications method
+            var whereClause = new StringBuilder(" WHERE 1=1");
+            if (!string.IsNullOrEmpty(empNo))
+            {
+                whereClause.Append(" AND empno LIKE @EmpNo");
+                parameters.Add("@EmpNo", $"%{empNo}%");
+            }
+            if (!string.IsNullOrEmpty(empName))
+            {
+                whereClause.Append(" AND empname LIKE @EmpName");
+                parameters.Add("@EmpName", $"%{empName}%");
+            }
+            if (!string.IsNullOrEmpty(status))
+            {
+                whereClause.Append(" AND appstatus = @Status");
+                parameters.Add("@Status", status);
+            }
+
+            // Add the WHERE clause to the count query
+            sqlBuilder.Append(whereClause.ToString());
+
+            using (var connection = new MySqlConnection(_connStr))
+            {
+                // ExecuteScalar is used to get a single value (the count)
+                return connection.ExecuteScalar<int>(sqlBuilder.ToString(), parameters);
+            }
+        }
 
     }
 }

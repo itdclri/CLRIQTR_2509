@@ -8,8 +8,7 @@
     int totalPages = (ViewBag.TotalPages != null && ViewBag.TotalPages > 0) ? ViewBag.TotalPages : 1;
 }
 
-<h2>@ViewBag.Title</h2>
-<hr />
+
 
 <nav class="navbar navbar-expand navbar-light bg-light mb-4">
     <div class="container">
@@ -89,6 +88,10 @@
         </ul>
     </div>
 </nav>
+
+<h2>@ViewBag.Title</h2>
+<hr />
+
 
 <div class="index-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;">
     <div class="right-search-section" style="flex-grow: 1;">

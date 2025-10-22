@@ -2,6 +2,43 @@
     ViewBag.Title = "Admin Login";
 }
 
+<style>
+    /* This div now *only* wraps the input and button */
+    .password-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    /* Make space inside the input box for the icon */
+    #password {
+        padding-right: 45px;
+    }
+
+    #togglePasswordBtn {
+        position: absolute; /* This positions the icon ON TOP of the input */
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%); /* This vertically centers it */
+        /* Button styling */
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #6c757d; /* Icon color, change as needed */
+    }
+
+    /* ADD THESE NEW RULES
+      This hides the browser's default "eye" icon
+    */
+    #password::-ms-reveal {
+        display: none;
+    }
+
+    #password::-webkit-reveal {
+        display: none !important;
+        -webkit-appearance: none !important;
+    }
+</style>
+
 <div class="login-container">
     <h2>
         <i class="bi bi-house-lock-fill"></i> Quarters Admin Login
@@ -16,9 +53,13 @@
 
         <div class="form-group">
             <label for="password"><i class="bi bi-shield-lock-fill"></i> Password</label>
-            <input type="password" id="password" name="password" class="form-control" required />
+            <div class="password-wrapper">
+                <input type="password" id="password" name="password" class="form-control" required />
+                <button type="button" id="togglePasswordBtn">
+                    <i class="bi bi-eye-slash-fill" id="togglePasswordIcon"></i>
+                </button>
+            </div>
         </div>
-
         <div class="form-group">
             <label for="LabCode"><i class="bi bi-building"></i> Lab</label>
             @Html.DropDownList("LabCode", (SelectList)ViewBag.Labs, "-- Select Lab --", new { @class = "form-control" })
@@ -36,3 +77,33 @@
         }
     }
 </div>
+
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const togglePasswordBtn = document.querySelector("#togglePasswordBtn");
+            const passwordInput = document.querySelector("#password");
+            const passwordIcon = document.querySelector("#togglePasswordIcon");
+
+            togglePasswordBtn.addEventListener("click", function () {
+                // Toggle the type attribute
+                const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+                passwordInput.setAttribute("type", type);
+
+                // Toggle the icon
+                if (type === "password") {
+                    // Show the 'slashed' eye
+                    passwordIcon.classList.remove("bi-eye-fill");
+                    passwordIcon.classList.add("bi-eye-slash-fill");
+                } else {
+                    // Show the 'open' eye
+                    passwordIcon.classList.remove("bi-eye-slash-fill");
+                    passwordIcon.classList.add("bi-eye-fill");
+                }
+            });
+        });
+    </script>
+}

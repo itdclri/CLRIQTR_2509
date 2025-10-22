@@ -30,7 +30,17 @@ namespace CLRIQTR.Services
         public QuarterOperationResult InsertOrUpdateQuarter(QtrUpd model, string[] selectedParts, bool isUpdate)
         {
             Debug.WriteLine("Update - V3");
+            Debug.WriteLine(model.qtrno2);
+            if (selectedParts is null)
+            {
+                selectedParts = new string[4];
 
+                var quarters = _quarterRepository.GetQuarterByEmployee(model.empno);
+
+                selectedParts[0] = quarters.qtrno2;
+                selectedParts[1] = quarters.qtrno3;
+                //selectedParts[3] = quarters.qtrno4;
+            }
 
             var result = new QuarterOperationResult { Success = false };
 
@@ -48,8 +58,13 @@ namespace CLRIQTR.Services
                         return result;
                     }
 
-                    // Build the qtrno
-                    string qtrNo = BuildQtrNo(quarterType.qtrdesc, selectedParts);
+
+                
+
+                
+
+                // Build the qtrno
+                string qtrNo = BuildQtrNo(quarterType.qtrdesc, selectedParts);
 
                
 
@@ -68,8 +83,10 @@ namespace CLRIQTR.Services
                         }
                     }
 
-                    model.qtroldno = model.qtrno;
-                    SetQuarterFields(model, quarterType, selectedParts, qtrNo);
+
+                model.qtroldno = model.qtrno;
+                if (model.qtrstatus == "O")
+                   SetQuarterFields(model, quarterType, selectedParts, qtrNo);
 
                     // Set all quarter fields
 
@@ -88,45 +105,80 @@ namespace CLRIQTR.Services
                     }
 
 
-                    
 
 
-                    // Perform insert or update
-                    if (isUpdate)
-                    {
-                        Debug.WriteLine((model.qtrno));
 
-                        _quarterRepository.UpdateQuarterStatus(model);
-                        result.Message = "Quarter details updated successfully!";
-                    }
-                    else
-                    {
-                        _quarterRepository.InsertQuarter(model);
-                        result.Message = "Quarter details inserted successfully!";
-                    }
+                // Perform insert or update
+                //if (isUpdate)
+                //{
+                //    Debug.WriteLine((model.qtrno));
+
+                //Debug.WriteLine("Method 1");
+
+                //_quarterRepository.UpdateQuarterStatus(model);
+                //    result.Message = "Quarter details updated successfully!";
+
+                //}
+                //else
+                //{
+                //Debug.WriteLine("Method 2");
+
+                //_quarterRepository.InsertQuarter(model);
+                //    result.Message = "Quarter details inserted successfully!";
+                //}
+
+             
 
 
                 if (!string.IsNullOrEmpty(model.qtroldno))
                 {
+                    Debug.WriteLine(model.qtroldno);
+                    Debug.WriteLine(model.qtrno);
                     // Compare with current quarter number
                     if (model.qtroldno == model.qtrno)
                     {
+                        Debug.WriteLine("Method 3");
+                        
                         isUpdate = true;
                         _quarterRepository.UpdateQuarterStatus(model);
+
+                       
+                        foreach (string part in selectedParts)
+                        {
+                          
+                            model.part = part;
+                            _quarterRepository.InsertQtrTxn(model);
+                        }
                     }
                     else
                     {
+                        Debug.WriteLine("Method 4");
+
                         // Vacate the existing quarter first
+                        int i = 0;
+                     
+
                         _quarterRepository.UpdateVacant(model);
 
                         // Then insert new quarter assignment
+
+
                         _quarterRepository.InsertQuarter(model);
                     }
                 }
                 else
                 {
+                    Debug.WriteLine("Method 5");
+
                     // No previous quarter - direct insert
                     _quarterRepository.InsertQuarter(model);
+                   
+                    foreach (string part in selectedParts)
+                    {
+                       
+                        model.part = part;
+                        _quarterRepository.InsertQtrTxn(model);
+                    }
                 }
 
 

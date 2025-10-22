@@ -8,6 +8,7 @@ namespace CLRIQTR.Data.Repositories.Interfaces
     {
         // Quarter Master Data Operations
         List<QtrTypeMaster> GetAllQuarterTypes();
+        
         List<QtrMaster> GetQuarterDetailsByType(string qtrType);
 
         // Quarter Assignment Operations (CRUD)
@@ -17,6 +18,8 @@ namespace CLRIQTR.Data.Repositories.Interfaces
         void UpdateQuarterStatus(QtrUpd quarter);
         void UpdateVacant(QtrUpd quarter);
         void InsertQuarter(QtrUpd quarter);
+
+        void InsertQtrTxn(QtrUpd quarter);
 
         // Quarter Availability Checking
         bool IsQtrNoAvailable(string qtrNo, string currentEmpNo = null);

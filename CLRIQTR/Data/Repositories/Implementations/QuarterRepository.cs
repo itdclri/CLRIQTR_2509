@@ -326,7 +326,7 @@ namespace CLRIQTR.Data.Repositories.Implementations
                 new MySqlParameter("@qtr_count", (object)quarter.qtr_count ?? DBNull.Value),
                 new MySqlParameter("@qtrtype", (object)quarter.qtrtype ?? DBNull.Value),
                 new MySqlParameter("@rem", (object)quarter.rem ?? DBNull.Value),
-                    new MySqlParameter("@empno", (object)quarter.empno ?? DBNull.Value),
+                    //new MySqlParameter("@empno", (object)quarter.empno ?? DBNull.Value),
                                         new MySqlParameter("@labcode", (object)quarter.labcode ?? DBNull.Value),
                                                             
 
@@ -415,6 +415,27 @@ namespace CLRIQTR.Data.Repositories.Implementations
                 return count == 0;
             });
         }
+
+        public void InsertQtrTxn(QtrUpd quarter)
+        {
+            const string sql = @"
+    INSERT INTO qtrtxn 
+    ( empno,qtrno, status,date, qtrtype,rem,FNAN)
+    VALUES 
+    ( @empno,@qtrno, @qtrstatus,@occdate, @qtrtype, @rem, @fnan)";
+
+            ExecuteNonQuery(sql,
+                new MySqlParameter("@qtrno", (object)quarter.part ?? DBNull.Value),
+                new MySqlParameter("@empno", quarter.empno),
+                new MySqlParameter("@qtrstatus", (object)quarter.qtrstatus ?? DBNull.Value),             
+                new MySqlParameter("@occdate", (object)quarter.occdate ?? DBNull.Value),
+                new MySqlParameter("@qtrtype", (object)quarter.qtrtype ?? DBNull.Value),
+                new MySqlParameter("@rem", (object)quarter.rem ?? DBNull.Value),
+                new MySqlParameter("@fnan", (object)quarter.FNAN ?? DBNull.Value)
+            );
+        }
+
+      
 
         #endregion
 

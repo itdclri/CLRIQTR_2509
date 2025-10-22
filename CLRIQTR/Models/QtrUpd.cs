@@ -33,5 +33,7 @@ namespace CLRIQTR.Models
         [NotMapped]
         public string qtroldno { get; set; }
 
+        public string part { get; set; }
+
     }
 }

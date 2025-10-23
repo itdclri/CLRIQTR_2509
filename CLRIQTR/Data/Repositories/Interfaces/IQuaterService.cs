@@ -155,7 +155,18 @@ namespace CLRIQTR.Services
                         Debug.WriteLine("Method 4");
 
                         // Vacate the existing quarter first
-                        int i = 0;
+
+                        
+
+                            Debug.WriteLine(model.qtroldno);
+                           
+                            string[] oldSelectedParts;
+                            oldSelectedParts = new string[4];
+
+                            var quarters = _quarterRepository.GetQuarterByEmployee(model.empno);
+                            oldSelectedParts[0] = quarters.qtrno2;
+                            oldSelectedParts[1] = quarters.qtrno3;                        
+                            //selectedParts[3] = quarters.qtrno4;
                      
 
                         _quarterRepository.UpdateVacant(model);
@@ -164,6 +175,26 @@ namespace CLRIQTR.Services
 
 
                         _quarterRepository.InsertQuarter(model);
+
+                        foreach (string part in selectedParts)
+                        {
+
+                            model.part = part;
+                            _quarterRepository.InsertQtrTxn(model);
+                        }
+
+
+                        foreach (string part in oldSelectedParts)
+                        {
+
+                            model.part = part;
+                            model.qtrtype = quarters.qtrtype;
+                            model.qtrstatus = "V";
+                            model.rem = null;
+                            _quarterRepository.InsertQtrTxn(model);
+                        }
+
+
                     }
                 }
                 else

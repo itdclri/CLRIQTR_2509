@@ -702,32 +702,32 @@ namespace CLRIQTR.Controllers
             return View();
         }
 
-        //// In AdminController.cs
+        // In AdminController.cs
 
-        //[HttpPost]
-        //public JsonResult SaveRoomRemark(QtrUpd model) // Accepts the relevant model
-        //{
-        //    // Validate the incoming data
-        //    if (model == null || string.IsNullOrWhiteSpace(model.qtrno) || string.IsNullOrWhiteSpace(model.rem))
-        //    {
-        //        return Json(new { success = false, message = "Invalid data received. Quarter Number and Remarks cannot be empty." });
-        //    }
+        [HttpPost]
+        public JsonResult SaveRoomRemark(QtrUpd model) // Accepts the relevant model
+        {
+            // Validate the incoming data
+            if (model == null || string.IsNullOrWhiteSpace(model.qtrno) || string.IsNullOrWhiteSpace(model.rem))
+            {
+                return Json(new { success = false, message = "Invalid data received. Quarter Number and Remarks cannot be empty." });
+            }
 
-        //    try
-        //    {
-        //        // Call your repository to perform the database update
-        //        _adminRepository.UpdateRoomRemark(model.qtrno, model.rem);
+            try
+            {
+                // Call your repository to perform the database update
+                _adminRepository.UpdateRoomRemark(model.qtrno, model.rem);
 
-        //        // Return a success response
-        //        return Json(new { success = true });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log the exception and return a generic error message
-        //        System.Diagnostics.Debug.WriteLine(ex);
-        //        return Json(new { success = false, message = "An error occurred while saving the remark." });
-        //    }
-        //}
+                // Return a success response
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception and return a generic error message
+                System.Diagnostics.Debug.WriteLine(ex);
+                return Json(new { success = false, message = "An error occurred while saving the remark." });
+            }
+        }
 
         public ActionResult Applications(string empNo, string empName, string status, int page = 1, int pageSize = 10)
         {

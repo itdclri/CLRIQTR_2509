@@ -729,6 +729,28 @@ namespace CLRIQTR.Controllers
             }
         }
 
+
+        [HttpGet]
+        public JsonResult GetRoomHistory(string qtrNo)
+        {
+            if (string.IsNullOrWhiteSpace(qtrNo))
+            {
+                return Json(new { success = false, message = "Quarter Number is required." }, JsonRequestBehavior.AllowGet);
+            }
+
+            try
+            {
+                // This is your real repository DB call
+                IEnumerable<RoomHistoryViewModel> history = _adminRepository.GetRoomHistoryByQtrNo(qtrNo);
+                return Json(new { success = true, data = history }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message); // Log the exception
+                return Json(new { success = false, message = "An error occurred while fetching history." }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         public ActionResult Applications(string empNo, string empName, string status, int page = 1, int pageSize = 10)
         {
             // 1. Set up pagination variables

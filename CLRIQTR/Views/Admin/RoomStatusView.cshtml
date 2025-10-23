@@ -2,6 +2,7 @@
 
 @{
     ViewBag.Title = "Room Status";
+    // Assuming you have a _Layout.cshtml that includes jQuery and Bootstrap JS/CSS
 }
 
 <nav class="navbar navbar-expand navbar-light bg-light mb-4">
@@ -25,7 +26,6 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="@Url.Action("RoomStatusView", "Admin")"><span><i class="bi bi-door-open-fill"></i> Quarters Status</span></a>
                 </li>
-
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="@Url.Action("Applications", "Admin")">
                         <span><i class="bi bi-file"></i> Applications</span>
@@ -38,24 +38,24 @@
             <div class="navbar-text me-3">
                 <i class="bi bi-person-badge"></i> Employee Number : <b>@Session["EmpNo"]</b><br />
                 <i class="bi bi-building"></i> Lab Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <b>
-    @{
-        if (Session["LabCode"] != null)
-        {
-            switch (Session["LabCode"].ToString())
-            {
-                case "100":
-                    @:CLRI
-                    break;
-                case "101":
-                    @:SERC
-                    break;
-                case "102":
-                    @:CMC
-                    break;
-            }
-        }
-    }
-</b>
+                    @{
+                        if (Session["LabCode"] != null)
+                        {
+                            switch (Session["LabCode"].ToString())
+                            {
+                                case "100":
+                                    @:CLRI
+                                    break;
+                                case "101":
+                                    @:SERC
+                                    break;
+                                case "102":
+                                    @:CMC
+                                    break;
+                            }
+                        }
+                    }
+                </b>
             </div>
         </div>
         @* Logout Button *@
@@ -69,9 +69,9 @@
 
 <h2>Room Status</h2>
 
-<div class="form-group">
+<div class="form-group mb-3">
     <label class="control-label">Quarters Type</label>
-    @Html.DropDownListFor(m => m.qtrtype, (SelectList)ViewBag.QtrTypes, "Select Quarters Type", new { @class = "form-control", id = "QtrTypeDropdown" })
+    @Html.DropDownListFor(m => m.qtrtype, (SelectList)ViewBag.QtrTypes, "Select Quarters Type", new { @class = "form-select", id = "QtrTypeDropdown" })
 </div>
 
 <hr />
@@ -85,7 +85,7 @@
                     <th>Quarter Number</th>
                     <th>Quarter Status</th>
                     <th>Occupied By</th>
-                    @*<th>Action</th>*@
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="QuarterStatusTableBody">
@@ -110,9 +110,23 @@
                 <input type="hidden" id="hiddenQtrNo" />
 
                 <div class="mb-3">
-                    <label for="remarksText" class="form-label">Remarks</label>
-                    <textarea class="form-control" id="remarksText" rows="4" placeholder="Enter remarks..."></textarea>
+                    <label for="Comments" class="form-label"><strong>Comments</strong></label>
+                    <select class="form-select" id="Comments" name="Comments">
+                        <option value="5">Others</option>
+                        <option value="1">Fit</option>
+                        <option value="2">Not Fit</option>
+                        <option value="1">Painting Work in Progress</option>
+                        <option value="3">Renovation Work in Progress</option>
+                        <option value="4">Carpentry Work</option>
+                        <option value="5">Temporarily allotted for hostel facility</option>
+                    </select>
                 </div>
+
+                <div class="mb-3">
+                    <label for="remarksText" class="form-label"><strong>Remarks</strong></label>
+                    <textarea class="form-control" id="remarksText" rows="4" placeholder="Enter remarks or select from Comments..."></textarea>
+                </div>
+
             </div>
             <div class="modal-footer">
                 <div id="modalAlertPlaceholder" class="w-100 mb-2"></div>
@@ -123,11 +137,31 @@
     </div>
 </div>
 
+<div class="modal fade" id="roomHistoryModal" tabindex="-1" aria-labelledby="roomHistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="roomHistoryModalLabel">History for Quarter: <span id="modalHistoryQtrNo"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalHistoryBody">
+                <p class="text-center">Loading history...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     <script type="text/javascript">
 $(document).ready(function () {
-    // Original script to fetch and display quarter statuses
+
+    // ========================================================================
+    // 1. Dropdown Change Event (Load Table)
+    // ========================================================================
     $('#QtrTypeDropdown').on('change', function () {
         var selectedQtrType = $(this).val();
         var tableBody = $('#QuarterStatusTableBody');
@@ -151,27 +185,29 @@ $(document).ready(function () {
                         var statusText = isOccupied ? '<span class="text-danger">Occupied</span>' : '<span class="text-success">Vacant</span>';
                         var occupiedByText = isOccupied ? item.OccupiedBy : '';
 
-                        // --- MODIFICATION START ---
-                        // Added data-* attributes to the Remarks button to trigger the modal
+                        // Dynamically create buttons for each row
                         var actionButtons = '<td>' +
-                            '<button type="button" class="btn btn-info btn-sm me-1">View History</button>' +
+                            '<button type="button" class="btn btn-info btn-sm me-1 view-history-btn" ' +
+                                'data-bs-toggle="modal" ' +
+                                'data-bs-target="#roomHistoryModal" ' +
+                                'data-qtr-no="' + item.PartNumber + '">' +
+                                'View History' +
+                            '</button>' +
                             '<button type="button" class="btn btn-secondary btn-sm remarks-btn" ' +
                                 'data-bs-toggle="modal" ' +
                                 'data-bs-target="#roomRemarksModal" ' +
                                 'data-qtr-no="' + item.PartNumber + '" ' +
-                                'data-remarks="' + (item.Remarks || '') + '">' + // Assumes your JSON has a 'Remarks' property
+                                'data-remarks="' + (item.Remarks || '') + '">' +
                                 'Remarks' +
                             '</button>' +
                             '</td>';
-                        // --- MODIFICATION END ---
 
                         var row = '<tr>' +
                             '<td>' + item.PartNumber + '</td>' +
                             '<td>' + statusText + '</td>' +
                             '<td>' + occupiedByText + '</td>' +
-                            //actionButtons +
+                            actionButtons +
                             '</tr>';
-
                         tableBody.append(row);
                     });
                 } else {
@@ -179,19 +215,20 @@ $(document).ready(function () {
                 }
             },
             error: function (xhr, status, error) {
-                tableBody.empty().append('<tr><td colspan="4" class="text-center text-danger">An error occurred.</td></tr>');
+                tableBody.empty().append('<tr><td colspan="4" class="text-center text-danger">An error occurred loading data.</td></tr>');
                 console.error("AJAX Error:", status, error, xhr.responseText);
             }
         });
     });
 
     // ========================================================================
-    // NEW: Script to handle the Remarks Modal functionality
+    // 2. Remarks Modal Functionality
     // ========================================================================
     const roomRemarksModal = document.getElementById('roomRemarksModal');
     const saveButton = document.getElementById('saveRemarkBtn');
     const alertPlaceholder = document.getElementById('modalAlertPlaceholder');
 
+    // Helper function for alerts
     const showAlert = (message, type) => {
         alertPlaceholder.innerHTML = [
             `<div class="alert alert-${type} alert-dismissible" role="alert">`,
@@ -201,7 +238,7 @@ $(document).ready(function () {
         ].join('');
     };
 
-    // When the modal is about to be shown, populate it with data from the clicked button
+    // When the remarks modal is about to be shown
     roomRemarksModal.addEventListener('show.bs.modal', function (event) {
         alertPlaceholder.innerHTML = ''; // Clear previous alerts
         const button = event.relatedTarget; // The button that triggered the modal
@@ -213,6 +250,24 @@ $(document).ready(function () {
         roomRemarksModal.querySelector('#modalQtrNo').textContent = qtrNo;
         roomRemarksModal.querySelector('#hiddenQtrNo').value = qtrNo;
         roomRemarksModal.querySelector('#remarksText').value = remarks || '';
+
+        // Reset comment dropdown to 'Others'
+        roomRemarksModal.querySelector('#Comments').value = '5';
+    });
+
+    // When the Comments dropdown changes, update the remarks textarea
+    $('#Comments').on('change', function() {
+        var selectedText = $(this).find('option:selected').text().trim();
+        var selectedVal = $(this).val();
+
+        if (selectedVal !== '5') { // '5' is the value for 'Others'
+             $('#remarksText').val(selectedText);
+        } else {
+             // If user selects 'Others' and the box wasn't already custom, clear it
+             if ($('#remarksText').val() != remarks || '') {
+                 $('#remarksText').val('');
+             }
+        }
     });
 
     // When the 'Save Changes' button is clicked
@@ -229,20 +284,33 @@ $(document).ready(function () {
         saveButton.disabled = true;
         saveButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...`;
 
-        const data = { QtrNo: qtrNo, Remarks: remarks };
+        const data = { qtrno: qtrNo, rem: remarks }; // Match the C# model properties
 
-        // IMPORTANT: This calls a NEW controller action 'SaveRoomRemark'
+        // Use fetch() to send data
         fetch('@Url.Action("SaveRoomRemark", "Admin")', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                // Add AntiForgeryToken if you are using it
+            },
             body: JSON.stringify(data),
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                 throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(result => {
             if (result.success) {
                 showAlert('Remarks saved successfully!', 'success');
-                // You might want to update the button's data-remarks attribute on the page here
-                // For now, we just close the modal.
+
+                // Find the button in the table and update its 'data-remarks' attribute
+                const tableButton = $(`button.remarks-btn[data-qtr-no="${qtrNo}"]`);
+                if(tableButton.length > 0) {
+                    tableButton.attr('data-remarks', remarks);
+                }
+
                 setTimeout(() => {
                     const modalInstance = bootstrap.Modal.getInstance(roomRemarksModal);
                     modalInstance.hide();
@@ -260,6 +328,63 @@ $(document).ready(function () {
             saveButton.innerHTML = originalButtonText;
         });
     });
+
+    // ========================================================================
+    // 3. View History Modal Functionality
+    // ========================================================================
+    const roomHistoryModal = document.getElementById('roomHistoryModal');
+    const historyModalBody = document.getElementById('modalHistoryBody');
+    const historyModalTitleSpan = document.getElementById('modalHistoryQtrNo');
+
+    // When the history modal is about to be shown
+    roomHistoryModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget; // Button that triggered the modal
+        const qtrNo = button.getAttribute('data-qtr-no');
+
+        // 1. Set modal title
+        historyModalTitleSpan.textContent = qtrNo;
+
+        // 2. Set loading state
+        historyModalBody.innerHTML = '<p class="text-center"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading history...</p>';
+
+        // 3. Make AJAX call to get history (using jQuery for consistency here)
+        $.ajax({
+            url: '@Url.Action("GetRoomHistory", "Admin")',
+            type: 'GET',
+            data: { qtrNo: qtrNo },
+            success: function (response) {
+                if (response.success && response.data && response.data.length > 0) {
+                    // 4. Build history table
+                    let tableHtml = '<table class="table table-striped table-sm">' +
+                        '<thead><tr><th>Emp No</th><th>Occupied By</th><th>Date of Occupancy</th><th>Date of Vacation</th></tr></thead>' +
+                        '<tbody>';
+
+                    $.each(response.data, function (index, item) {
+                        tableHtml += '<tr>' +
+                            '<td>' + (item.EmpNo || '') + '</td>' +
+                            '<td>' + (item.EmpName || '') + '</td>' +
+                            '<td>' + (item.DateOfOccupancy || 'N/A') + '</td>' +
+                            '<td>' + (item.DateOfVacation || '<span class="badge bg-success">Present</span>') + '</td>' +
+                            '</tr>';
+                    });
+
+                    tableHtml += '</tbody></table>';
+                    historyModalBody.innerHTML = tableHtml;
+                } else if (response.success) {
+                    // No history found
+                    historyModalBody.innerHTML = '<p class="text-center text-muted">No history found for this quarter.</p>';
+                } else {
+                    // Error from controller
+                    historyModalBody.innerHTML = '<p class="text-center text-danger">Error: ' + (response.message || 'Could not load history.') + '</p>';
+                }
+            },
+            error: function () {
+                // AJAX-level error
+                historyModalBody.innerHTML = '<p class="text-center text-danger">A network error occurred while fetching history.</p>';
+            }
+        });
+    });
+
 });
     </script>
 }

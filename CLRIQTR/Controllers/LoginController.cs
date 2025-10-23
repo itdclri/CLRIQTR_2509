@@ -47,7 +47,7 @@ namespace CLRIQTR.Controllers
                 return RedirectToAction("Index", "Admin");
             }
 
-            ViewBag.Error = "Invalid Employee No, Lab, or account inactive.";
+            ViewBag.Error = "Invalid Employee No, Password or Lab.";
             LoadLabs();
             return View();
         }

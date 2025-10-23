@@ -1,8 +1,9 @@
 ﻿using CLRIQTR.Models;
+using Dapper;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using MySql.Data.MySqlClient;
 using System.Linq;
 
 namespace CLRIQTR.Repositories
@@ -1334,6 +1335,79 @@ namespace CLRIQTR.Repositories
                     Console.WriteLine($"A database error occurred: {ex.Message}");
                     throw;
                 }
+            }
+        }
+
+        //GetRoomHistoryByQtrNo
+
+
+        /// <summary>
+        /// Gets the occupancy history for a specific quarter using your query.
+        /// </summary>
+        public IEnumerable<RoomHistoryViewModel> GetRoomHistoryByQtrNo(string partNumber)
+        {
+            // 1. Split the partNumber (e.g., "T1-101") into type ("T1") and number ("101")
+            string qtrType = null;
+            string qtrNoStr = null;
+
+            if (!string.IsNullOrEmpty(partNumber))
+            {
+                // Splits "T1-101" into "T1" and "101"
+                var parts = partNumber.Split(new[] { '-' }, 2);
+                if (parts.Length > 0) qtrType = parts[0];
+                if (parts.Length > 1) qtrNoStr = parts[1];
+            }
+
+            if (string.IsNullOrEmpty(qtrType) || string.IsNullOrEmpty(qtrNoStr))
+            {
+                return new List<RoomHistoryViewModel>();
+            }
+
+           
+            string sql = @"
+                WITH RoomHistory AS (
+                    SELECT
+                        EMPNO,
+                        STATUS,
+                        `DATE`,
+                        QTRTYPE,
+                        QTRNO,
+                        LEAD(STATUS) OVER (
+                            PARTITION BY QTRTYPE, QTRNO 
+                            ORDER BY `DATE` ASC
+                        ) AS NextStatus,
+                        LEAD(`DATE`) OVER (
+                            PARTITION BY QTRTYPE, QTRNO 
+                            ORDER BY `DATE` ASC
+                        ) AS NextTransactionDate
+                    FROM
+                        QTRTXN
+                    WHERE 
+                        QTRTYPE = @qtrType AND QTRNO = @qtrNo
+                )
+                SELECT 
+                    rh.EMPNO AS EmpNo,
+                    e.empname AS EmpName,
+                    DATE_FORMAT(rh.`DATE`, '%d-%b-%Y') AS DateOfOccupancy,
+                    CASE 
+                        WHEN rh.NextStatus = 'V' THEN DATE_FORMAT(rh.NextTransactionDate, '%d-%b-%Y') 
+                        ELSE NULL 
+                    END AS DateOfVacation
+                FROM 
+                    RoomHistory rh
+                LEFT JOIN 
+                    empmast e ON rh.EMPNO = e.empno
+                WHERE 
+                    rh.STATUS = 'O'
+                ORDER BY
+                    rh.`DATE` DESC; 
+            ";
+
+            // 3. Execute the query using Dapper
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                // Pass the C# variables as parameters to the SQL query
+                return conn.Query<RoomHistoryViewModel>(sql, new { qtrType = qtrType, qtrNo = qtrNoStr });
             }
         }
 

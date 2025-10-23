@@ -138,6 +138,10 @@ namespace CLRIQTR.Models
 
         public FamilyDetails FamilyDetails { get; set; }
 
+
+        [NotMapped]
+        public string Family { get; set; }
+
     }
 
     // In ~/Models/EmpDepDtls.cs

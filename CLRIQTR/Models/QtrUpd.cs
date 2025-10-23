@@ -36,4 +36,12 @@ namespace CLRIQTR.Models
         public string part { get; set; }
 
     }
+
+    public class RoomHistoryViewModel
+    {
+        public string EmpNo { get; set; }
+        public string EmpName { get; set; }
+        public string DateOfOccupancy { get; set; }
+        public string DateOfVacation { get; set; }
+    }
 }

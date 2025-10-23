@@ -43,12 +43,52 @@ namespace CLRIQTR.Data.Repositories.Implementations
 
         public EmpMastTest GetEmployeeByNoForView(string empNo)
         {
-            const string sql = @"SELECT e.*, d.DesDesc, l.LabName,q.qtrno,q.occdate,q.qtrtype,q.qtrstatus
-                         FROM empmast e
-                         left JOIN desmast d ON e.Designation = d.DesId
-                         left JOIN labmast l ON e.LabCode = l.LabCode
-                         left JOIN qtrupd q ON q.empno = e.empno 
-                         WHERE e.EmpNo = @empNo";
+            const string sql = @"SELECT 
+    e.*, 
+    d.DesDesc, 
+    l.LabName,
+    q.qtrno,
+    q.occdate,
+    q.qtrtype,
+    q.qtrstatus,
+    
+    -- This is your first query, added as a new column
+    (
+        SELECT
+            GROUP_CONCAT(
+                CASE
+                    WHEN depcode IS NULL THEN depname
+                    ELSE CONCAT(depname, ' (', depcode, rn, ')')
+                END
+                SEPARATOR ', '
+            ) AS FamilyDetails
+        FROM (
+            SELECT
+                dep_e.empno,
+                dep_e.depname,
+                m.depcode,
+                ROW_NUMBER() OVER(PARTITION BY dep_e.empno, m.depcode ORDER BY dep_e.depname) AS rn
+            FROM
+                empdep dep_e  -- Renamed to 'dep_e' to avoid conflict
+            LEFT JOIN
+                empdepmast m ON dep_e.depid = m.depid
+            WHERE
+                dep_e.empno = e.empno -- This line links the subquery to the main query
+        ) AS NumberedDependents
+        GROUP BY
+            empno
+    ) AS FamilyDetails
+
+FROM 
+    empmast e
+LEFT JOIN 
+    desmast d ON e.Designation = d.DesId
+LEFT JOIN 
+    labmast l ON e.LabCode = l.LabCode
+LEFT JOIN 
+    qtrupd q ON q.empno = e.empno
+WHERE 
+    e.EmpNo = @empNo;";
 
             using (var conn = new MySqlConnection(_connStr))
             using (var cmd = new MySqlCommand(sql, conn))
@@ -254,6 +294,7 @@ namespace CLRIQTR.Data.Repositories.Implementations
                 OccDate = reader["occdate"] as string,
                 QtrType = reader["qtrtype"] as string,
                 QtrStatus = reader["qtrstatus"] as string,
+                Family = reader["FamilyDetails"] as string
 
 
 

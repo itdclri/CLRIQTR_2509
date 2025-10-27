@@ -1,4 +1,4 @@
-﻿using CLRIQTR.Data.Repositories.Interfaces;
+using CLRIQTR.Data.Repositories.Interfaces;
 using CLRIQTR.Models;
 using MySql.Data.MySqlClient;
 using System;
@@ -418,6 +418,9 @@ namespace CLRIQTR.Data.Repositories.Implementations
 
         public void InsertQtrTxn(QtrUpd quarter)
         {
+            Debug.WriteLine(quarter.qtrstatus);
+
+
             const string sql = @"
     INSERT INTO qtrtxn 
     ( empno,qtrno, status,date, qtrtype,rem,FNAN)
@@ -427,9 +430,9 @@ namespace CLRIQTR.Data.Repositories.Implementations
             ExecuteNonQuery(sql,
                 new MySqlParameter("@qtrno", (object)quarter.part ?? DBNull.Value),
                 new MySqlParameter("@empno", quarter.empno),
-                new MySqlParameter("@qtrstatus", (object)quarter.qtrstatus ?? DBNull.Value),             
-                new MySqlParameter("@occdate", (object)quarter.occdate ?? DBNull.Value),
-                new MySqlParameter("@qtrtype", (object)quarter.qtrtype ?? DBNull.Value),
+                new MySqlParameter("@qtrstatus", (object)quarter.qtrstatus ?? DBNull.Value),
+new MySqlParameter("@occdate", quarter.occdate ?? DateTime.Now),
+new MySqlParameter("@qtrtype", (object)quarter.qtrtype ?? DBNull.Value),
                 new MySqlParameter("@rem", (object)quarter.rem ?? DBNull.Value),
                 new MySqlParameter("@fnan", (object)quarter.FNAN ?? DBNull.Value)
             );
@@ -558,25 +561,27 @@ ORDER BY qm.qtr_no";
         public List<dynamic> GetPartsWithOccupancy(string qtrtype, string currentEmpNo)
         {
             const string sql = @"
-        SELECT 
+        SELECT
     qm.qtr_no AS PartNumber,
-    CASE 
-        WHEN MAX(CASE WHEN qu.qtrstatus = 'O' THEN 1 ELSE 0 END) = 1 THEN 1 
-        ELSE 0 
+    CASE
+        WHEN MAX(CASE WHEN qu.qtrstatus = 'O' THEN 1 ELSE 0 END) = 1 THEN 1
+        ELSE 0
     END AS Occupied,
     MAX(CASE WHEN qu.qtrstatus = 'O' THEN qu.empno ELSE NULL END) AS OccupiedBy,
-    MAX(CASE WHEN qu.qtrstatus = 'O' AND qu.empno = @currentEmpNo THEN 1 ELSE 0 END) AS IsCurrentUser,QU.REM AS REM
+    MAX(CASE WHEN qu.qtrstatus = 'O' AND qu.empno = @currentEmpNo THEN 1 ELSE 0 END) AS IsCurrentUser,
+    -- Combine all remarks into one comma-separated string
+    GROUP_CONCAT(DISTINCT QU.REM) AS REM
 FROM qtr_master qm
-LEFT JOIN qtrupd qu 
+LEFT JOIN qtrupd qu
     ON (
-        qu.qtrno2 = qm.qtr_no OR 
-        qu.qtrno3 = qm.qtr_no OR 
+        qu.qtrno2 = qm.qtr_no OR
+        qu.qtrno3 = qm.qtr_no OR
         qu.qtrno4 = qm.qtr_no
     )
     AND qm.qtr_type = qu.qtrtype
 WHERE qm.qtr_type = @qtrtype
-GROUP BY qm.qtr_no,QU.REM
-ORDER BY qm.qtr_no ";
+GROUP BY qm.qtr_no
+ORDER BY qm.qtr_no; ";
 
             return ExecuteQuery(sql, cmd =>
             {

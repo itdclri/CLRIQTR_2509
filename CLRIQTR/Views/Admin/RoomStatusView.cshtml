@@ -1,4 +1,4 @@
-﻿@model CLRIQTR.Models.QtrUpd
+@model CLRIQTR.Models.QtrUpd
 
 @{
     ViewBag.Title = "Room Status";
@@ -112,19 +112,29 @@
                 <div class="mb-3">
                     <label for="Comments" class="form-label"><strong>Comments</strong></label>
                     <select class="form-select" id="Comments" name="Comments">
-                        <option value="5">Others</option>
+
                         <option value="1">Fit</option>
                         <option value="2">Not Fit</option>
                         <option value="1">Painting Work in Progress</option>
                         <option value="3">Renovation Work in Progress</option>
                         <option value="4">Carpentry Work</option>
                         <option value="5">Temporarily allotted for hostel facility</option>
+                        <option value="6">Others</option>
                     </select>
                 </div>
 
                 <div class="mb-3">
                     <label for="remarksText" class="form-label"><strong>Remarks</strong></label>
                     <textarea class="form-control" id="remarksText" rows="4" placeholder="Enter remarks or select from Comments..."></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="Status" class="form-label"><strong>Status</strong></label>
+                    <select class="form-select" id="Status" name="Status">
+
+                        <option value="O">Occupied</option>
+                        <option value="V">Vacantt</option>
+                        
+                    </select>
                 </div>
 
             </div>
@@ -216,7 +226,7 @@ $(document).ready(function () {
             },
             error: function (xhr, status, error) {
                 tableBody.empty().append('<tr><td colspan="4" class="text-center text-danger">An error occurred loading data.</td></tr>');
-                console.error("AJAX Error:", status, error, xhr.responseText);
+                console.error("AJAX Error:", status, error, xhr.responseText); // Kept this console.error for debugging
             }
         });
     });
@@ -259,21 +269,35 @@ $(document).ready(function () {
     $('#Comments').on('change', function() {
         var selectedText = $(this).find('option:selected').text().trim();
         var selectedVal = $(this).val();
+        var originalRemarks = $('#remarksText').val(); // Store original remarks
 
         if (selectedVal !== '5') { // '5' is the value for 'Others'
              $('#remarksText').val(selectedText);
         } else {
-             // If user selects 'Others' and the box wasn't already custom, clear it
-             if ($('#remarksText').val() != remarks || '') {
+             // If user selects 'Others'
+             // Check if the current text is one of the dropdown options
+             var isPresetText = false;
+             $('#Comments option').each(function() {
+                 if ($(this).val() !== '5' && $(this).text().trim() === originalRemarks) {
+                     isPresetText = true;
+                 }
+             });
+
+             // Only clear it if it was a preset text
+             if (isPresetText) {
                  $('#remarksText').val('');
              }
+             // If it was already custom text, leave it alone.
         }
     });
+
 
     // When the 'Save Changes' button is clicked
     saveButton.addEventListener('click', function () {
         const qtrNo = document.getElementById('hiddenQtrNo').value;
         const remarks = document.getElementById('remarksText').value;
+        const status = document.getElementById('Status').value;
+        var selectedQtrType = $('#QtrTypeDropdown').val(); // <-- Get qtrType
 
         if (!remarks.trim()) {
             showAlert('Remarks cannot be empty.', 'warning');
@@ -284,7 +308,10 @@ $(document).ready(function () {
         saveButton.disabled = true;
         saveButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...`;
 
-        const data = { qtrno: qtrNo, rem: remarks }; // Match the C# model properties
+        const data = {
+            qtrno: qtrNo, rem: remarks,
+            qtrstatus: status, qtrType: selectedQtrType
+}; // Match the C# model properties
 
         // Use fetch() to send data
         fetch('@Url.Action("SaveRoomRemark", "Admin")', {
@@ -297,7 +324,7 @@ $(document).ready(function () {
         })
         .then(response => {
             if (!response.ok) {
-                 throw new Error('Network response was not ok');
+                throw new Error('Network response was not ok');
             }
             return response.json();
         })
@@ -320,7 +347,7 @@ $(document).ready(function () {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error:', error); // Kept this console.error for debugging
             showAlert('An unexpected network error occurred.', 'danger');
         })
         .finally(() => {
@@ -347,11 +374,17 @@ $(document).ready(function () {
         // 2. Set loading state
         historyModalBody.innerHTML = '<p class="text-center"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading history...</p>';
 
+        // Get the currently selected quarter type from the main dropdown
+        var selectedQtrType = $('#QtrTypeDropdown').val(); // <-- Get qtrType
+
         // 3. Make AJAX call to get history (using jQuery for consistency here)
         $.ajax({
             url: '@Url.Action("GetRoomHistory", "Admin")',
             type: 'GET',
-            data: { qtrNo: qtrNo },
+            data: {
+                qtrNo: qtrNo,
+                qtrType: selectedQtrType  // <-- Pass qtrType
+            },
             success: function (response) {
                 if (response.success && response.data && response.data.length > 0) {
                     // 4. Build history table

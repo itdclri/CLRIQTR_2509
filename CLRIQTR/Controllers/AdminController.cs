@@ -1,4 +1,4 @@
-﻿using CLRIQTR.Data.Repositories.Implementations;
+using CLRIQTR.Data.Repositories.Implementations;
 using CLRIQTR.Data.Repositories.Interfaces;
 using CLRIQTR.Models;
 using CLRIQTR.Repositories;
@@ -716,7 +716,9 @@ namespace CLRIQTR.Controllers
             try
             {
                 // Call your repository to perform the database update
-                _adminRepository.UpdateRoomRemark(model.qtrno, model.rem);
+
+                model.part = model.qtrno;
+              _quarterRepo.InsertQtrTxn(model);
 
                 // Return a success response
                 return Json(new { success = true });
@@ -731,17 +733,21 @@ namespace CLRIQTR.Controllers
 
 
         [HttpGet]
-        public JsonResult GetRoomHistory(string qtrNo)
+        public JsonResult GetRoomHistory(string qtrNo , string qtrType)
         {
             if (string.IsNullOrWhiteSpace(qtrNo))
             {
                 return Json(new { success = false, message = "Quarter Number is required." }, JsonRequestBehavior.AllowGet);
             }
 
+            Debug.WriteLine(qtrNo);
+            Debug.WriteLine(qtrType);
+
+          
             try
             {
                 // This is your real repository DB call
-                IEnumerable<RoomHistoryViewModel> history = _adminRepository.GetRoomHistoryByQtrNo(qtrNo);
+                IEnumerable<RoomHistoryViewModel> history = _adminRepository.GetRoomHistoryByQtrNo(qtrNo, qtrType);
                 return Json(new { success = true, data = history }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)

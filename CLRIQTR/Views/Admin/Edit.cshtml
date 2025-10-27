@@ -85,7 +85,7 @@
         <div class="form-group">
             @Html.Label("Employee Name", new { @class = "control-label col-md-2" })
             <div class="col-md-4">
-                @Html.TextBoxFor(m => m.EmpName, new { @class = "form-control", @readonly = "readonly" })
+                @Html.TextBoxFor(m => m.EmpName, new { @class = "form-control"})
                 @Html.ValidationMessageFor(m => m.EmpName)
             </div>
         </div>

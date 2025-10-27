@@ -1,9 +1,10 @@
-﻿using CLRIQTR.Models;
+using CLRIQTR.Models;
 using Dapper;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 
 namespace CLRIQTR.Repositories
@@ -1344,26 +1345,15 @@ namespace CLRIQTR.Repositories
         /// <summary>
         /// Gets the occupancy history for a specific quarter using your query.
         /// </summary>
-        public IEnumerable<RoomHistoryViewModel> GetRoomHistoryByQtrNo(string partNumber)
+        public IEnumerable<RoomHistoryViewModel> GetRoomHistoryByQtrNo(string partNumber ,string qtrType)
         {
-            // 1. Split the partNumber (e.g., "T1-101") into type ("T1") and number ("101")
-            string qtrType = null;
-            string qtrNoStr = null;
+           
 
-            if (!string.IsNullOrEmpty(partNumber))
-            {
-                // Splits "T1-101" into "T1" and "101"
-                var parts = partNumber.Split(new[] { '-' }, 2);
-                if (parts.Length > 0) qtrType = parts[0];
-                if (parts.Length > 1) qtrNoStr = parts[1];
-            }
-
-            if (string.IsNullOrEmpty(qtrType) || string.IsNullOrEmpty(qtrNoStr))
+            if (string.IsNullOrEmpty(qtrType) || string.IsNullOrEmpty(qtrType))
             {
                 return new List<RoomHistoryViewModel>();
             }
 
-           
             string sql = @"
                 WITH RoomHistory AS (
                     SELECT
@@ -1407,7 +1397,7 @@ namespace CLRIQTR.Repositories
             using (var conn = new MySqlConnection(connectionString))
             {
                 // Pass the C# variables as parameters to the SQL query
-                return conn.Query<RoomHistoryViewModel>(sql, new { qtrType = qtrType, qtrNo = qtrNoStr });
+                return conn.Query<RoomHistoryViewModel>(sql, new { qtrType = qtrType, qtrNo = partNumber });
             }
         }
 
